@@ -10,9 +10,26 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useState } from "react";
+
+type ProductStatus = "in-stock" | "low-stock" | "out-of-stock";
+
+interface Product {
+  id: number;
+  name: string;
+  sku: string;
+  category: string;
+  brand: string;
+  stock: number;
+  status: ProductStatus;
+  price: string;
+  value: string;
+  lastUpdated: string;
+}
+
 
 export function ProductTable({ searchQuery }: { searchQuery: string }) {
-  const products = [
+  const products : Product[]  = [
     {
       id: 1,
       name: "Premium Leather Jacket",
@@ -89,8 +106,44 @@ export function ProductTable({ searchQuery }: { searchQuery: string }) {
     );
   };
 
+  const [activeCategory, setActiveCategory] = useState<string>("All");
+
+  const categories: string[] = [
+  "All",
+  ...Array.from(new Set(products.map(p => p.category))),
+];
+
+const filteredProducts = products.filter(product => {
+  const matchesCategory =
+    activeCategory === "All" || product.category === activeCategory;
+
+  const matchesSearch =
+    product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    product.sku.toLowerCase().includes(searchQuery.toLowerCase());
+
+  return matchesCategory && matchesSearch;
+});
+
+
   return (
     <div className="space-y-4 text-gray-900">
+        <div className="flex flex-wrap gap-2 border-b pb-3">
+  {categories.map(category => (
+    <Button
+      key={category}
+      size="sm"
+      className={
+        activeCategory === category
+          ? "bg-gray-900 text-white hover:bg-gray-800"
+          : "text-gray-900 border-gray-800"
+      }
+      onClick={() => setActiveCategory(category)}
+    >
+      {category}
+    </Button>
+  ))}
+</div>
+
       <div className="rounded-md border">
         <Table>
           <TableHeader>
@@ -108,7 +161,7 @@ export function ProductTable({ searchQuery }: { searchQuery: string }) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {products.map((product) => (
+            {filteredProducts.map((product) =>(
               <TableRow key={product.id}>
                 <TableCell className="font-medium">
                   <div>

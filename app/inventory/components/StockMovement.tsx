@@ -3,10 +3,26 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ArrowUp, ArrowDown, Eye } from "lucide-react";
+import { ArrowUp, ArrowDown,  } from "lucide-react";
+import { useState } from "react";
+
+type MovementType = "Sale" | "Restock" | "Adjustment" | "Return";
+
+interface StockMovement {
+  id: number;
+  date: string;
+  product: string;
+  sku: string;
+  type: MovementType;
+  quantity: number;
+  before: number;
+  after: number;
+  reference: string;
+}
+
 
 export function StockMovementTable() {
-  const movements = [
+  const movements: StockMovement[] = [
     { 
       id: 1, 
       date: "2024-01-20 10:30 AM", 
@@ -51,21 +67,39 @@ export function StockMovementTable() {
       after: 24,
       reference: "Don Toliver"
     },
-    { 
-      id: 5, 
-      date: "2024-01-18 02:30 PM", 
-      product: "Wool Blend Suits", 
-      sku: "WBS-005", 
-      type: "Return", 
-      quantity: +1, 
-      before: 15, 
-      after: 16,
-      reference: "Ariana Grande"
-    },
+    
   ];
+
+  const [activeType, setActiveType] = useState<MovementType | "All">("All");
+  const movementTabs: (MovementType | "All")[] = [
+  "All",
+  "Sale",
+  "Restock",
+  "Adjustment",
+];
+
+const filteredMovements = movements.filter(movement =>
+  activeType === "All" ? true : movement.type === activeType
+);
 
   return (
     <div className="space-y-4  bg-gray-900 ">
+        <div className="flex flex-wrap gap-2 border-b border-gray-800 pb-3">
+  {movementTabs.map(tab => (
+    <Button
+      key={tab}
+      size="sm"
+      className={
+        activeType === tab
+          ? "bg-white text-gray-900 hover:bg-gray-200 "
+          : "border-gray-700 text-gray-900 hover:bg-gray-800 hover:text-white"
+      }
+      onClick={() => setActiveType(tab)}
+    >
+      {tab}
+    </Button>
+  ))}
+</div>
       <div className="rounded-md border ">
         <Table >
           <TableHeader>
@@ -79,7 +113,7 @@ export function StockMovementTable() {
             </TableRow>
           </TableHeader>
           <TableBody >
-            {movements.map((movement) => (
+           {filteredMovements.map((movement) => (
               <TableRow key={movement.id}>
                 <TableCell className="font-medium">{movement.date}</TableCell>
                 <TableCell>{movement.product}</TableCell>
