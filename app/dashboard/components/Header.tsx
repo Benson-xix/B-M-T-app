@@ -3,6 +3,7 @@ import { Bell, Menu, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import Link from "next/link";
 
 interface HeaderProps {
   onMenuClick: () => void;
@@ -12,7 +13,7 @@ export function Header({ onMenuClick }: HeaderProps) {
   const [notifications] = useState(3);
 
   return (
-    <header className="sticky top-0 z-40 bg-gray-900/80 backdrop-blur-sm border-b border-gray-800">
+    <header className="sticky top-0 z-40 bg-gray-900 backdrop-blur-sm border-b border-gray-800">
       <div className="flex items-center justify-between h-16 px-4 md:px-6">
         <div className="flex items-center gap-4">
           <Button
@@ -26,11 +27,15 @@ export function Header({ onMenuClick }: HeaderProps) {
           
           <div className="hidden md:block">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <Input
-                placeholder="Search dashboard..."
-                className="pl-9 w-64 bg-gray-800 border-gray-700 text-white placeholder:text-gray-400"
-              />
+             <Link href="/dashboard" className="flex items-center gap-3">
+          <div className="h-8 w-8 bg-yellow-300 rounded-lg flex items-center justify-center">
+            <span className="text-black font-bold text-sm">BMT</span>
+          </div>
+          <div>
+            <div className="font-bold text-white text-lg">Big Men</div>
+            <div className="text-xs text-gray-400 -mt-1">Transaction Apparel</div>
+          </div>
+        </Link>
             </div>
           </div>
         </div>

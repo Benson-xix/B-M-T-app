@@ -53,10 +53,10 @@ export function DateRangeFilter({ onDateRangeChange }: DateRangeFilterProps) {
   };
 
   return (
-    <div className="flex flex-col xs:flex-row xs:items-center gap-3 sm:gap-4">
-      <Select value={selectedRange} onValueChange={handleRangeChange}>
+    <div className="flex bg-gray-900 flex-col xs:flex-row xs:items-center gap-3 sm:gap-4">
+      <Select value={selectedRange} onValueChange={handleRangeChange} >
         <SelectTrigger className="w-full 
-      min-w-[180px] 
+      min-w-45
       xs:w-44 
       sm:w-52
       bg-gray-900 border-gray-700 text-white h-10">

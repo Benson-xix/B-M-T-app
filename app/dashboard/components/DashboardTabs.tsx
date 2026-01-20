@@ -17,11 +17,11 @@ export function DashboardTabs({ activeTab, onTabChange, children }: DashboardTab
   ];
 
   return (
-   <Tabs value={activeTab} onValueChange={onTabChange} className="w-full max-w-full overflow-x-hidden mb-4 border-b border-default">
+   <Tabs value={activeTab} onValueChange={onTabChange} className="w-full  max-w-full overflow-x-hidden mb-4 border-b border-default">
  
   <div className="relative overflow-x-hidden">
     <TabsList
-      className="w-full h-30 md:h-15 grid  md:grid-cols-5 grid-cols-3 gap-3 bg-gray-900/50 border border-gray-800  rounded-lg"
+      className="w-full h-30 md:h-15 grid  md:grid-cols-5 grid-cols-3 gap-3 bg-gray-900 text-white border border-gray-800  rounded-lg"
     >
       {tabs.map((tab) => (
         <TabsTrigger

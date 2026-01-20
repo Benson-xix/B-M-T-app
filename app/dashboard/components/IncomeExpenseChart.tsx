@@ -42,7 +42,7 @@ const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
 
 export function IncomeExpenseChart() {
   return (
-    <div className="aspect-[4/3] min-h-[260px] sm:aspect-[5/3] md:aspect-[16/9] lg:aspect-[5/3] w-full">
+    <div className="aspect-4/3 min-h-65 sm:aspect-5/3 md:aspect-video  lg:aspect-5/3 w-full">
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={data}>
           <CartesianGrid strokeDasharray="3 3" stroke="#374151" />

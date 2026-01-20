@@ -4,22 +4,22 @@ import { Button } from "@/components/ui/button";
 export default function Home() {
   return (
     <main className="min-h-screen bg-linear-to-br from-black via-gray-900 to-black p-4 md:p-8 lg:p-24 overflow-x-hidden">
-      {/* Animated Background Elements */}
+     
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-20 -right-20 md:-top-40 md:-right-40 w-40 h-40 md:w-80 md:h-80 bg-yellow-300/10 rounded-full blur-2xl md:blur-3xl"></div>
         <div className="absolute -bottom-20 -left-20 md:-bottom-40 md:-left-40 w-40 h-40 md:w-80 md:h-80 bg-yellow-300/5 rounded-full blur-2xl md:blur-3xl"></div>
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-48 h-48 md:w-96 md:h-96 bg-yellow-300/3 rounded-full blur-2xl md:blur-3xl"></div>
         
-        {/* Grid Pattern */}
+       
         <div className="absolute inset-0 opacity-5">
           <div className="h-full w-full bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-size-[24px_24px]"></div>
         </div>
       </div>
 
-      {/* Main Content Container */}
+     
       <div className="relative z-10 flex flex-col items-center justify-center min-h-screen max-w-7xl mx-auto">
         
-        {/* Logo/Brand Header */}
+       
         <div className="w-full text-center mb-8 md:mb-16">
           <div className="inline-flex items-center justify-center gap-3 md:gap-6 mb-4">
             <div className="hidden sm:block w-1.5 h-8 md:w-2 md:h-12 bg-yellow-300 rounded-full"></div>
@@ -36,7 +36,7 @@ export default function Home() {
           </p>
         </div>
 
-        {/* Hero Section */}
+       
         <div className="w-full max-w-4xl text-center mb-12 md:mb-20 px-4">
           <div className="mb-8 md:mb-12">
             <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 md:mb-6">
@@ -54,7 +54,7 @@ export default function Home() {
             </p>
           </div>
           
-          {/* Capabilities Grid */}
+         
           <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 my-8 md:my-12">
             {[
               { label: "Premium Collections", value: "BMT", icon: "👔" },
@@ -74,14 +74,14 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Action Section */}
+        
         <div className="flex flex-col items-center gap-6 md:gap-8 w-full max-w-md px-4">
           <Button 
             asChild
             className="group w-full max-w-xs sm:max-w-sm px-6 py-6 sm:px-12 sm:py-6 bg-yellow-300 hover:bg-yellow-400 text-black font-bold text-base sm:text-lg rounded-xl hover:rounded-2xl transition-all duration-300 transform hover:scale-[1.02] active:scale-95 shadow-lg hover:shadow-xl shadow-yellow-300/20 h-auto"
           >
             <Link href="/auth/login" className="w-full">
-              <div className="absolute -inset-1 bg-yellow-300/20 blur-md group-hover:blur-lg transition-all duration-300 rounded-xl"></div>
+             
               <span className="relative flex items-center justify-center gap-2 sm:gap-3 w-full">
                 <span className="text-sm sm:text-base">ENTER ADMIN PORTAL</span>
                 <svg className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -91,7 +91,7 @@ export default function Home() {
             </Link>
           </Button>
 
-          {/* Secondary Options */}
+         
           <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 text-gray-400 text-sm">
             <span className="text-xs sm:text-sm">Need administrator access?</span>
             <Link 
@@ -106,7 +106,7 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Security & Footer */}
+        
         <div className="mt-12 md:mt-20 pt-6 md:pt-8 border-t border-gray-800/30 w-full max-w-2xl px-4">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
             <div className="text-gray-500 text-xs">
@@ -128,7 +128,7 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Decorative Elements */}
+     
       <div className="fixed bottom-4 right-4 md:bottom-8 md:right-8">
         <div className="relative">
           <div className="w-24 h-24 md:w-32 md:h-32 border border-yellow-300/20 rounded-full animate-spin-slow"></div>
@@ -136,7 +136,7 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Bottom Pattern */}
+      
       <div className="fixed bottom-0 left-0 right-0 h-20 bg-linear-to-t from-black to-transparent pointer-events-none"></div>
     </main>
   );
