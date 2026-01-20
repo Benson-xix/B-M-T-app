@@ -13,6 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Plus, Trash2, Image as ImageIcon, Hash,Layers } from "lucide-react";
 import { toast } from 'sonner';
 import Image from 'next/image';
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 interface Variation {
   id: number;
@@ -128,6 +129,9 @@ const [brand, setBrand] = useState<string>("");
 
 const [customBaseSku, setCustomBaseSku] = useState<string | null>(null);
 
+
+const [categoryModalOpen, setCategoryModalOpen] = useState(false);
+const [newCategoryName, setNewCategoryName] = useState("");
 
     function abbreviateWord(word: string): string {
   if (word.length <= 3) return word.toUpperCase();
@@ -389,10 +393,16 @@ const handleVariantImageUpload = (id: number, files: FileList | null) => {
                       <SelectItem value="shoes">Shoes</SelectItem>
                     </SelectContent>
                   </Select>
-                  <Button variant="link" size="sm" className="mt-1 p-0 h-auto text-gray-900">
+                 <Button
+                    variant="link"
+                    size="sm"
+                    className="mt-1 p-0 h-auto text-gray-900"
+                    onClick={() => setCategoryModalOpen(true)}
+                    >
                     <Plus className="h-3 w-3 mr-1" />
                     Create new category
-                  </Button>
+                    </Button>
+
                 </div>
               </div>
               
@@ -654,6 +664,51 @@ const handleVariantImageUpload = (id: number, files: FileList | null) => {
                 </CardContent>
               </Card>
             )}
+
+            <Dialog open={categoryModalOpen} onOpenChange={setCategoryModalOpen} >
+                <DialogContent className="sm:max-w-md bg-white text-gray-900">
+                    <DialogHeader>
+                    <DialogTitle className='text-gray-900'>New Category</DialogTitle>
+                    </DialogHeader>
+
+                    <div className="space-y-4">
+                    <div className="flex flex-col gap-2">
+                        <Label htmlFor="categoryName">Category Name</Label>
+                        <Input
+                        id="categoryName"
+                        placeholder="e.g. Jackets"
+                        value={newCategoryName}
+                        onChange={(e) => setNewCategoryName(e.target.value)}
+                        className='border border-gray-900'
+                        />
+                    </div>
+                    </div>
+
+                    <DialogFooter className="flex gap-2">
+                    <Button
+                        className='bg-red-500 text-gray-900 hover:bg-red-300'
+                        onClick={() => {
+                        setCategoryModalOpen(false);
+                        setNewCategoryName("");
+                        }}
+                    >
+                        Cancel
+                    </Button>
+
+                    <Button
+                        className="bg-gray-900 text-white hover:bg-gray-800"
+                        disabled={!newCategoryName.trim()}
+                        onClick={() => {
+                        toast.success(`Category "${newCategoryName}" created`);
+                        setCategoryModalOpen(false);
+                        setNewCategoryName("");
+                        }}
+                    >
+                        Create Category
+                    </Button>
+                    </DialogFooter>
+                </DialogContent>
+                </Dialog>
 
            
             <div className="flex justify-end gap-3 pt-4 border-t">
