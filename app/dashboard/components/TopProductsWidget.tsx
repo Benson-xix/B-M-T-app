@@ -32,7 +32,7 @@ export function TopProductsWidget() {
               key={product.id}
               className="group flex flex-col md:flex-row gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors duration-200 items-center"
             >
-              {/* Rank */}
+              
               <div
                 className={cn(
                   "shrink-0 h-8 w-8 flex items-center justify-center rounded-md font-bold text-sm",
@@ -45,7 +45,7 @@ export function TopProductsWidget() {
                 {index + 1}
               </div>
 
-              {/* Image */}
+             
               <div className="flex-shrink-0 w-16 h-16 rounded-md overflow-hidden bg-gray-100 border border-gray-200 group-hover:shadow-sm">
                 {product.image ? (
                   <Image
@@ -63,7 +63,7 @@ export function TopProductsWidget() {
                 )}
               </div>
 
-              {/* Product Info */}
+           
               <div className="flex-1 min-w-0 flex flex-col md:flex-row md:items-center md:justify-between gap-2 w-full">
                 <div className="flex-1 min-w-0">
                   <h4 className="font-semibold text-gray-900 truncate group-hover:text-gray-700">
@@ -84,7 +84,7 @@ export function TopProductsWidget() {
                 </div>
               </div>
 
-              {/* Progress Bar */}
+            
               <div className="w-full md:w-32 mt-2 md:mt-0 flex items-center gap-2">
                 <div className="flex-1 h-1.5 bg-gray-200 rounded-full overflow-hidden">
                   <div
@@ -100,7 +100,7 @@ export function TopProductsWidget() {
           ))}
         </div>
 
-        {/* Footer Note */}
+        
         <div className="mt-6 pt-4 border-t border-gray-200 flex flex-col md:flex-row items-center justify-between gap-2">
           <div className="text-sm text-gray-600">
             <span className="text-yellow-600 font-medium">Note:</span> 
