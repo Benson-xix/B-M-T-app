@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Pencil } from 'lucide-react';
+import Link from 'next/link';
 
 interface PageProps {
   customerId: string;
@@ -604,6 +605,18 @@ export function CustomerDetailPage({ customerId }: PageProps) {
                         </td>
                         <td className="p-3">
                           <div className="flex gap-2">
+
+                            {
+                                txn.paymentMethod === 'installment' && (
+                                    <Link href='/sales/installment-page'>
+                                    <Button 
+                                    variant='link'
+                                    >
+                                    View Installment Schedule
+                                    </Button>
+                                    </Link>
+                                )
+                            }
                           
                             {txn.paymentMethod !== 'installment' && (
                               <button 
