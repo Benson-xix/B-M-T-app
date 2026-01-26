@@ -195,7 +195,8 @@ const handleCompleteSale = () => {
     amount: getActualDownPayment(),
     date: timestamp,
     dueDate: installmentPlan.startDate,
-    status: 'down_payment',
+    status: 'paid',
+  type: 'down_payment',
   },
   ...Array.from({ length: numberOfInstallments }, (_, i) => {
     const isLast = i === numberOfInstallments - 1;
@@ -218,6 +219,7 @@ const handleCompleteSale = () => {
         i + 1
       ),
       status: 'pending',
+      type: 'installment',
     } satisfies InstallmentPayment;
   }),
 ];
@@ -1144,6 +1146,7 @@ const [downPaymentPercent, setDownPaymentPercent] = useState(
       amount,
       dueDate: dueDate.toISOString().split('T')[0],
       status: i === 0 ? 'paid' : 'pending',
+      type: i === 0 ? 'down_payment' : 'installment',
     });
   }
 
@@ -1323,10 +1326,12 @@ const [downPaymentPercent, setDownPaymentPercent] = useState(
                       <td className="p-3">{payment.dueDate}</td>
                       <td className="p-3">
                         <Badge 
-                          variant={payment.status === 'down_payment' ? 'default' : 'secondary'}
-                          className={payment.status === 'down_payment' ? 'bg-yellow-500 text-black' : ''}
+                          variant={payment.type === 'down_payment' ? 'default' : 'secondary'}
+                          className={payment.type === 'down_payment' ? 'bg-yellow-500 text-black' : ''}
                         >
-                          {payment.status === 'down_payment' ? 'Down Payment' : 'Pending'}
+                          {payment.type === 'down_payment'
+                            ? 'Down Payment'
+                            : payment.status}
                         </Badge>
                       </td>
                     </tr>

@@ -21,8 +21,8 @@ interface ReceiptProps {
     downPayment: number;
     remainingBalance: number;
   };
-  transactionId?: string; // Add transaction ID
-  receiptDate?: string; // Add receipt date
+  transactionId?: string; 
+  receiptDate?: string; 
 }
 
 export function Receipt({

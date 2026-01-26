@@ -45,9 +45,11 @@ payments: Array<{
   expectedAmount: number;
   paidAmount: number;
   status: 'paid' | 'pending' | 'partial' | 'overdue';
+  type?: 'down_payment' | 'installment'; 
   paidDate?: string;
   method?: 'cash' | 'card' | 'transfer';
 }>;
+
   status: 'active' | 'completed' | 'defaulted';
 };
 
@@ -77,6 +79,346 @@ interface RawInstallmentPlan {
   }>;
 }
 
+import ReactDOMServer from 'react-dom/server';
+import { Receipt } from '@/app/pos/components/Receipt';
+import { InstallmentTransaction } from '@/app/utils/type';
+
+
+function printInstallmentReceipt(params: {
+  plan: InstallmentPlan;
+  paymentNumber: number;
+  amountPaid: number;
+  method: 'cash' | 'card' | 'transfer';
+}) {
+  const { plan, paymentNumber, amountPaid, method } = params;
+
+  const receiptHtml = ReactDOMServer.renderToString(
+    <Receipt
+      customer={{
+        name: plan.customer.name,
+        email: plan.customer.email,
+        phone: plan.customer.phone,
+        id: 'customer'
+      }}
+     cart={[
+  {
+    id: `installment-${plan.id}-${paymentNumber}`,
+    productId: plan.id,
+    variantId: `payment-${paymentNumber}`,
+    productName: `Installment Payment #${paymentNumber}`,
+    variantName: plan.paymentFrequency,
+    sku: `INST-${paymentNumber}`,
+    price: amountPaid,
+    quantity: 1,
+    taxable: false,
+    image: '',
+    stock: 0,
+  },
+]}
+      subtotal={amountPaid}
+      tax={0}
+      total={amountPaid}
+      paymentMethod={method}
+      amountPaid={amountPaid}
+      change={0}
+      purchaseType="in-store"
+     installmentPlan={{
+  numberOfPayments: plan.numberOfPayments,
+  amountPerPayment: plan.amountPerPayment,
+  paymentFrequency: plan.paymentFrequency as 'daily' | 'weekly' | 'monthly',
+  startDate: plan.startDate,
+  notes: '',
+  downPayment: plan.downPayment,
+  remainingBalance: plan.remainingBalance - amountPaid,
+}}
+      transactionId={`INST-${plan.id}-${paymentNumber}`}
+      receiptDate={new Date().toLocaleString()}
+    />
+  );
+
+  const win = window.open('', '_blank', 'width=500,height=800');
+  if (!win) return;
+
+  win.document.write(`
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <title>Installment Receipt - ${plan.id}</title>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+          @media print {
+            @page {
+              size: auto;
+              margin: 0mm;
+            }
+            body {
+              margin: 0;
+              padding: 10px;
+              -webkit-print-color-adjust: exact !important;
+              print-color-adjust: exact !important;
+            }
+            .no-print { display: none !important; }
+          }
+          
+          body {
+            margin: 0;
+            padding: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #111827;
+            color: white;
+            line-height: 1.5;
+          }
+          
+          .print-controls {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            z-index: 1000;
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border: 1px solid #ddd;
+          }
+          
+          .print-controls button {
+            background: #111827;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: sans-serif;
+            font-size: 14px;
+            margin-right: 10px;
+          }
+          
+          .print-controls button:hover {
+            background: #1f2937;
+          }
+          
+          .print-controls button:last-child {
+            background: #dc2626;
+          }
+          
+          .print-controls button:last-child:hover {
+            background: #b91c1c;
+          }
+          
+          @media print {
+            body {
+              background: white !important;
+              color: black !important;
+            }
+            .bg-yellow-300 { background-color: #facc15 !important; }
+            .bg-yellow-900\/20 { background-color: rgba(120, 53, 15, 0.2) !important; }
+            .text-gray-100 { color: #000 !important; }
+            .text-gray-300 { color: #000 !important; }
+            .text-gray-400 { color: #666 !important; }
+            .text-yellow-300 { color: #92400e !important; }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="print-controls no-print">
+          <button onclick="window.print()">🖨️ Print Receipt</button>
+          <button onclick="window.close()">❌ Close</button>
+        </div>
+        ${receiptHtml}
+        
+        <script>
+          // Auto-close after printing
+          window.onafterprint = function() {
+            setTimeout(() => {
+              window.close();
+            }, 1000);
+          };
+          
+          // Keyboard shortcuts
+          document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 'p') {
+              e.preventDefault();
+              window.print();
+            }
+            if (e.key === 'Escape') {
+              window.close();
+            }
+          });
+        </script>
+      </body>
+    </html>
+  `);
+
+  win.document.close();
+  win.focus();
+};
+
+function printInstallmentReceiptFromTransaction(
+  tx: InstallmentTransaction
+) {
+  const receiptHtml = ReactDOMServer.renderToString(
+    <Receipt
+      customer={{
+        id: tx.planId,
+        name: tx.customer.name,
+        email: tx.customer.email,
+        phone: tx.customer.phone,
+      }}
+      cart={[
+        {
+          id: tx.id,
+          productId: tx.planId,
+          variantId: `payment-${tx.paymentNumber}`,
+          productName: `Installment Payment #${tx.paymentNumber}`,
+          variantName: tx.paymentFrequency,
+          sku: tx.id,
+          price: tx.amountPaid,
+          quantity: 1,
+          taxable: false,
+          image: '',
+          stock: 0,
+        },
+      ]}
+      subtotal={tx.amountPaid}
+      tax={0}
+      total={tx.amountPaid}
+      paymentMethod={tx.paymentMethod}
+      amountPaid={tx.amountPaid}
+      change={0}
+      purchaseType="in-store"
+      installmentPlan={{
+        numberOfPayments: tx.numberOfPayments,
+        amountPerPayment: tx.amountPerPayment,
+        paymentFrequency: tx.paymentFrequency,
+        startDate: tx.timestamp,
+        notes: '',
+        downPayment: tx.downPayment,
+        remainingBalance: tx.remainingBalanceAfter,
+      }}
+      transactionId={tx.id}
+      receiptDate={new Date(tx.timestamp).toLocaleString()}
+    />
+  );
+
+    const win = window.open('', '_blank', 'width=500,height=800');
+  if (!win) return;
+
+  win.document.write(`
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <title>Installment Receipt - ${tx.id}</title>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+          @media print {
+            @page {
+              size: auto;
+              margin: 0mm;
+            }
+            body {
+              margin: 0;
+              padding: 10px;
+              -webkit-print-color-adjust: exact !important;
+              print-color-adjust: exact !important;
+            }
+            .no-print { display: none !important; }
+          }
+          
+          body {
+            margin: 0;
+            padding: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #111827;
+            color: white;
+            line-height: 1.5;
+          }
+          
+          .print-controls {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            z-index: 1000;
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border: 1px solid #ddd;
+          }
+          
+          .print-controls button {
+            background: #111827;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: sans-serif;
+            font-size: 14px;
+            margin-right: 10px;
+          }
+          
+          .print-controls button:hover {
+            background: #1f2937;
+          }
+          
+          .print-controls button:last-child {
+            background: #dc2626;
+          }
+          
+          .print-controls button:last-child:hover {
+            background: #b91c1c;
+          }
+          
+          @media print {
+            body {
+              background: white !important;
+              color: black !important;
+            }
+            .bg-yellow-300 { background-color: #facc15 !important; }
+            .bg-yellow-900\/20 { background-color: rgba(120, 53, 15, 0.2) !important; }
+            .text-gray-100 { color: #000 !important; }
+            .text-gray-300 { color: #000 !important; }
+            .text-gray-400 { color: #666 !important; }
+            .text-yellow-300 { color: #92400e !important; }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="print-controls no-print">
+          <button onclick="window.print()">🖨️ Print Receipt</button>
+          <button onclick="window.close()">❌ Close</button>
+        </div>
+        ${receiptHtml}
+        
+        <script>
+          // Auto-close after printing
+          window.onafterprint = function() {
+            setTimeout(() => {
+              window.close();
+            }, 1000);
+          };
+          
+          // Keyboard shortcuts
+          document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 'p') {
+              e.preventDefault();
+              window.print();
+            }
+            if (e.key === 'Escape') {
+              window.close();
+            }
+          });
+        </script>
+      </body>
+    </html>
+  `);
+
+  win.document.close();
+  win.focus();
+} 
+
 export default function InstallmentsPage() {
   const [installments, setInstallments] = useState<InstallmentPlan[]>([]);
 
@@ -90,6 +432,16 @@ const [paymentAmount, setPaymentAmount] = useState('');
 const [paymentMethod, setPaymentMethod] =
   useState<'cash' | 'card' | 'transfer'>('cash');
 
+const [expandedPlanId, setExpandedPlanId] = useState<string | null>(null);
+
+const toggleSchedule = (planId: string) => {
+  setExpandedPlanId(prev => (prev === planId ? null : planId));
+};
+
+
+const ITEMS_PER_PAGE = 5;
+
+const [currentPage, setCurrentPage] = useState(1);
 
 function hasLegacyAmount(
   p: unknown
@@ -154,6 +506,11 @@ paidAmount: Number(
       status: ['paid', 'pending', 'partial', 'overdue'].includes(p.status || '')
         ? (p.status as 'paid' | 'pending' | 'partial' | 'overdue')
         : 'pending',
+        type:
+        Number(p.paymentNumber) === 1 &&
+        Number(plan.downPayment) > 0
+          ? 'down_payment'
+          : 'installment',
       paidDate: p.paidDate ? String(p.paidDate) : undefined,
       method: p.method as 'cash' | 'card' | 'transfer' | undefined,
     }))
@@ -286,8 +643,51 @@ const handleRecordPayment = () => {
     return updated;
   });
 
-  toast.success('Payment recorded successfully');
+ toast.success('Payment recorded successfully', {
+  action: {
+    label: 'Print Receipt',
+    onClick: () =>
+      printInstallmentReceipt({
+        plan: selectedPlan,
+        paymentNumber: selectedPayment,
+        amountPaid: Number(paymentAmount),
+        method: paymentMethod,
+      }),
+  },
+});
 
+
+  printInstallmentReceipt({
+  plan: selectedPlan,
+  paymentNumber: selectedPayment,
+  amountPaid: Number(paymentAmount),
+  method: paymentMethod,
+});
+
+const transaction: InstallmentTransaction = {
+  id: `INST-${selectedPlan.id}-${selectedPayment}-${Date.now()}`,
+  planId: selectedPlan.id,
+  paymentNumber: selectedPayment,
+  customer: selectedPlan.customer,
+  amountPaid: Number(paymentAmount),
+  paymentMethod,
+  paymentFrequency: selectedPlan.paymentFrequency as 'daily' | 'weekly' | 'monthly',
+  numberOfPayments: selectedPlan.numberOfPayments,
+  amountPerPayment: selectedPlan.amountPerPayment,
+  downPayment: selectedPlan.downPayment,
+  remainingBalanceAfter:
+    selectedPlan.remainingBalance - Number(paymentAmount),
+  timestamp: new Date().toISOString(),
+};
+const existing =
+  JSON.parse(localStorage.getItem('installment_transactions') || '[]');
+
+existing.push(transaction);
+
+localStorage.setItem(
+  'installment_transactions',
+  JSON.stringify(existing)
+);
   setPaymentAmount('');
   setSelectedPlan(null);
   setSelectedPayment(null);
@@ -334,6 +734,26 @@ const handleRecordPayment = () => {
     const date = new Date(dateString);
     return date.toLocaleDateString();
   };
+
+
+
+
+  const totalPages = Math.ceil(filteredInstallments.length / ITEMS_PER_PAGE);
+
+const sortedInstallments = [...filteredInstallments].sort(
+  (a, b) =>
+    new Date(b.startDate).getTime() -
+    new Date(a.startDate).getTime()
+);
+
+
+const paginatedInstallments = sortedInstallments.slice(
+  (currentPage - 1) * ITEMS_PER_PAGE,
+  currentPage * ITEMS_PER_PAGE
+);
+
+
+
 
   return (
     <InventoryLayout>
@@ -503,7 +923,7 @@ const handleRecordPayment = () => {
               </div>
             ) : (
               <div className="space-y-6">
-                {filteredInstallments.map((plan) => (
+                {paginatedInstallments.map((plan) => (
                   <Card key={plan.id} className="overflow-hidden bg-white text-gray-900 border border-gray-200 shadow-2xl rounded-2xl" >
                     <CardContent className="p-0">
                  
@@ -546,68 +966,124 @@ const handleRecordPayment = () => {
 
                     
                       <div className="p-4">
-                        <div className="text-sm font-medium mb-3">Payment Schedule ({plan.paymentFrequency})</div>
-                        <div className="border rounded-lg overflow-hidden">
-                          <table className="w-full">
-                            <thead className="bg-gray-50">
-                              <tr>
-                                <th className="p-3 text-left text-sm">Payment #</th>
-                                <th className="p-3 text-left text-sm">Amount</th>
-                                <th className="p-3 text-left text-sm">Due Date</th>
-                                <th className="p-3 text-left text-sm">Status</th>
-                                <th className="p-3 text-left text-sm">Actions</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {(plan.payments ?? []).map((payment) => (
-                                <tr key={payment.paymentNumber} className="border-t">
-                                  <td className="p-3">
-                                    <div className="flex items-center gap-2">
-                                      <CreditCard className="h-4 w-4 text-gray-400" />
-                                      Payment {payment.paymentNumber}
-                                    </div>
-                                  </td>
-                                  <td className="p-3 font-medium">
-                                   {formatCurrency(payment.expectedAmount)}
-                                  </td>
-                                  <td className="p-3">
-                                    <div className="flex items-center gap-2">
-                                      <Calendar className="h-4 w-4 text-gray-400" />
-                                      {formatDate(payment.dueDate)}
-                                    </div>
-                                  </td>
-                                  <td className="p-3">
-                                    {getPaymentStatusBadge(payment.status, payment.dueDate)}
-                                  </td>
-                                  <td className="p-3">
-                                    {payment.status === 'pending' && (
-                                     <Button
-                                      size="sm"
-                                      onClick={() => {
-                                        setSelectedPlan(plan);
-                                        setSelectedPayment(payment.paymentNumber);
-                                      }}
-                                    >
-                                      Record Payment
-                                    </Button>
-                                    )}
-                                    {payment.status === 'paid' && payment.paidDate && (
-                                      <div className="text-sm text-gray-500">
-                                        Paid on: {formatDate(payment.paidDate)}
-                                      </div>
-                                    )}
-                                  </td>
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
-                        </div>
+                         <Button
+                          variant="secondary"
+                          size="sm"
+                          onClick={() => toggleSchedule(plan.id)}
+                          className="mb-3"
+                        >
+                          {expandedPlanId === plan.id ? 'Hide Schedule' : 'View Schedule'}
+                        </Button>
+                         {expandedPlanId === plan.id && (
+                          <>
+                            <div className="text-sm font-medium mb-3">
+                              Payment Schedule ({plan.paymentFrequency})
+                            </div>
+
+                            <div className="border rounded-lg overflow-hidden">
+                              <table className="w-full">
+                                <thead className="bg-gray-50">
+                                  <tr>
+                                    <th className="p-3 text-left text-sm">Payment #</th>
+                                    <th className="p-3 text-left text-sm">Amount</th>
+                                    <th className="p-3 text-left text-sm">Due Date</th>
+                                    <th className='p-3 text-left text-sm'>Type</th>
+                                    <th className="p-3 text-left text-sm">Status</th>
+                                    <th className="p-3 text-left text-sm">Actions</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {(plan.payments ?? []).map((payment) => (
+                                    <tr key={payment.paymentNumber} className="border-t">
+                                     <td className="p-3"> 
+                                      <div className="flex items-center gap-2">
+                                       <CreditCard className="h-4 w-4 text-gray-400" /> Payment {payment.paymentNumber}
+                                        </div>
+                                         </td>
+                                          <td className="p-3 font-medium"> {formatCurrency(payment.expectedAmount)} </td>
+                                           <td className="p-3"> 
+                                            <div className="flex items-center gap-2">
+                                               <Calendar className="h-4 w-4 text-gray-400" /> {formatDate(payment.dueDate)} 
+                                               </div>
+                                            </td> 
+                                            <td className="p-3">
+                                          <div className="flex gap-2 items-center">
+                                            {payment.type === 'down_payment' ? (
+                                              <Badge variant="secondary">Down Payment</Badge>
+                                            ) : (
+                                              <Badge variant="secondary" className='bg-teal-300 text-teal-700'>Installment</Badge>
+                                            )}
+                                          </div>
+                                        </td>
+                                     <td className="p-3"> {getPaymentStatusBadge(payment.status, payment.dueDate)} </td> 
+                                    
+                                     <td className="p-3"> 
+                                      {payment.status === 'pending' && ( 
+                                        <Button size="sm" onClick={() => { setSelectedPlan(plan); setSelectedPayment(payment.paymentNumber); }} >
+                                           Record Payment </Button> )} {payment.status === 'paid' && payment.paidDate && ( 
+                                        <div className="text-sm text-gray-500">
+                                           Paid on: {formatDate(payment.paidDate)} </div>
+                                         )}
+                                         {payment.status === 'paid' && (
+                                        <Button
+                                          size="sm"
+                                          variant="secondary"
+                                          onClick={() => {
+                                            const txs: InstallmentTransaction[] =
+                                              JSON.parse(localStorage.getItem('installment_transactions') || '[]');
+
+                                            const tx = txs.find(
+                                              t =>
+                                                t.planId === plan.id &&
+                                                t.paymentNumber === payment.paymentNumber
+                                            );
+
+                                            if (!tx) {
+                                              toast.error('Receipt not found');
+                                              return;
+                                            }
+
+                                            printInstallmentReceiptFromTransaction(tx);
+                                          }}
+                                        >
+                                          View Receipt
+                                        </Button>
+                                      )}
+                                       </td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                            </div>
+                          </>
+  )}
                       </div>
                     </CardContent>
                   </Card>
                 ))}
               </div>
             )}
+            <div className="flex justify-between items-center mt-6">
+            <Button
+              variant="secondary"
+              disabled={currentPage === 1}
+              onClick={() => setCurrentPage(p => Math.max(p - 1, 1))}
+            >
+              Previous
+            </Button>
+
+            <span className="text-sm text-gray-600">
+              Page {currentPage} of {totalPages}
+            </span>
+
+            <Button
+              variant="secondary"
+              disabled={currentPage === totalPages}
+              onClick={() => setCurrentPage(p => Math.min(p + 1, totalPages))}
+            >
+              Next
+            </Button>
+          </div>
           </CardContent>
         </Card>
 

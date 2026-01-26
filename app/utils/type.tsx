@@ -96,10 +96,12 @@ export interface InstallmentPayment {
   amount: number;
   date?: string;
   dueDate: string;
-  status: 'paid' | 'pending' | 'overdue' | 'down_payment';
+  status: 'paid' | 'pending' | 'overdue';
+  type?: 'down_payment' | 'installment';
   method?: string;
   notes?: string;
 }
+
 
 export interface InstallmentPlan {
   numberOfPayments: number;
@@ -135,3 +137,29 @@ export interface Transaction {
   waived: true
 }
 }
+
+export interface InstallmentTransaction {
+  id: string;
+  planId: string;
+  paymentNumber: number;
+  customer: {
+    name: string;
+    email?: string;
+    phone?: string;
+  };
+  amountPaid: number;
+  paymentMethod: 'cash' | 'card' | 'transfer';
+  paymentFrequency: 'daily' | 'weekly' | 'monthly';
+  numberOfPayments: number;
+  amountPerPayment: number;
+  downPayment: number;
+  remainingBalanceAfter: number;
+  timestamp: string;
+}
+
+export const customers: Customer[] = [
+  { id: 'walk-in', name: 'Walk-in Customer' },
+  { id: 'cust-1', name: 'John Doe', email: 'john@example.com', phone: '+1234567890' },
+  { id: 'cust-2', name: 'Jane Smith', email: 'jane@example.com', phone: '+0987654321' },
+  { id: 'cust-3', name: 'Robert Johnson', email: 'robert@example.com', phone: '+1122334455' },
+];
