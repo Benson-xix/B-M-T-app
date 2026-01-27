@@ -167,7 +167,7 @@ const handleRejectLogin = (id: string) => {
     
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-white">Dashboard Overview</h1>
+          <h1 className="text-3xl font-bold text-gray-900">Dashboard Overview</h1>
           <p className="text-gray-900 mt-1">
             Welcome back! Here&apos;s what&apos;s happening with your business.
           </p>
