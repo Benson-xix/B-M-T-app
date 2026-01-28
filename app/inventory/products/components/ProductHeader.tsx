@@ -37,7 +37,7 @@ export function ProductHeader({ product }: ProductHeaderProps) {
          <div className="flex md:items-center  justify-end  gap-3 text-gray-900">
          <div className="relative">
               <Link href="/dashboard" className="flex items-center gap-3">
-          <div className="h-8 w-8 bg-yellow-300 rounded-lg flex items-center justify-center">
+          <div className="h-8 w-8 bg-green-400 rounded-lg flex items-center justify-center">
             <span className="text-black font-bold text-sm">BMT</span>
           </div>
           <div>

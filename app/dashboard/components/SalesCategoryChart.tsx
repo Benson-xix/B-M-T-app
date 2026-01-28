@@ -26,7 +26,7 @@ const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
     return (
       <div className="bg-gray-900 border border-gray-700 p-3 rounded-lg shadow-lg">
         <p className="font-medium text-white">{payload[0].name}</p>
-        <p className="text-yellow-300">{payload[0].value}% of total sales</p>
+        <p className="text-green-400">{payload[0].value}% of total sales</p>
       </div>
     );
   }

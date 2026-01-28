@@ -19,6 +19,7 @@ interface Variation {
   id: number;
   name: string;
   sku: string;
+  barcode: string;
   costPrice: number;
   sellingPrice: number;
   quantity: number;
@@ -116,7 +117,6 @@ export default function AddProductForm() {
   const [variations, setVariations] = useState<Variation[]>([]);
   const [hasVariations, setHasVariations] = useState(false);
   const [variantsGenerated, setVariantsGenerated] = useState(false);
-
   const [images, setImages] = useState<string[]>([]);
   const [attributes, setAttributes] = useState<
   { id: string; name: string; values: string[] }[]
@@ -197,6 +197,19 @@ const generateVariations = () => {
     )
   );
 };
+
+const updateVariantText = (
+  id: number,
+  field: "barcode",
+  value: string
+) => {
+  setVariations(prev =>
+    prev.map(v =>
+      v.id === id ? { ...v, [field]: value } : v
+    )
+  );
+};
+
 
 const updateAttributeName = (index: number, name: string) => {
   setAttributes(prev => {
@@ -296,6 +309,7 @@ function buildVariations(
       id: existingVariant?.id ?? Date.now() + index,
       name,
       sku,
+      barcode: existingVariant?.barcode ?? "",
       costPrice: existingVariant?.costPrice ?? 0,
       sellingPrice: existingVariant?.sellingPrice ?? 0,
       quantity: existingVariant?.quantity ?? 0,
@@ -588,6 +602,20 @@ const handleVariantImageUpload = (id: number, files: FileList | null) => {
     updateVariation(variant.id, "threshold", Number(e.target.value))
   } className='border-gray-900 border-2 shadow-lg' />
                             </div>
+
+                            <div className="flex flex-col gap-3">
+                              <Label>Barcode</Label>
+                              <Input
+                                type="text"
+                                placeholder="Scan or enter barcode"
+                                value={variant.barcode}
+                                onChange={(e) =>
+                                  updateVariantText(variant.id, "barcode", e.target.value)
+                                }
+                                className="border-gray-900 border-2 shadow-lg"
+                              />
+                            </div>
+
                           </div>
                           
                           <div>
@@ -660,6 +688,15 @@ const handleVariantImageUpload = (id: number, files: FileList | null) => {
                       <Label>Low Stock Threshold</Label>
                       <Input type="number" placeholder="10" className='border-gray-900 border-2 shadow-lg' />
                     </div>
+
+                   <div className="flex flex-col gap-3">
+                    <Label>Barcode</Label>
+                    <Input
+                      type="text"
+                      placeholder="Scan or enter barcode"
+                      className="border-gray-900 border-2 shadow-lg"
+                    />
+                  </div> 
                   </div>
                 </CardContent>
               </Card>

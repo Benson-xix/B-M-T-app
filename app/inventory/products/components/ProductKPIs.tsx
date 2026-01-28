@@ -28,7 +28,7 @@ export function ProductKPIs({ product }: ProductKPIsProps) {
       title: "Total Stock",
       value: product.totalStock,
       icon: Package,
-      color: "bg-yellow-500",
+      color: "bg-green-400",
       
     },
     {

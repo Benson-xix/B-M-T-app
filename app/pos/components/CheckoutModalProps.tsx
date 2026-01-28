@@ -73,6 +73,9 @@ export function CheckoutModal({
     (sum, p) => sum + (parseFloat(p.amount) || 0),
     0
   );
+const [transactionId, setTransactionId] = useState<string | null>(null);
+
+const [creditType, setCreditType] = useState<'full' | 'partial'>('full');
 
 
   const [useInstallments, setUseInstallments] = useState<boolean>(false);
@@ -157,15 +160,24 @@ const handleCompleteSale = () => {
   
   // eslint-disable-next-line react-hooks/purity
   const transactionId = `txn_${Date.now()}`;
+  setTransactionId(transactionId);
   const timestamp = new Date().toISOString();
 
-  // ---- CREDIT GUARD ----
   if (paymentMethod === 'credit' && !isCustomerVerified) {
     toast.error('Credit sales are only available for verified customers');
     return;
   }
 
-  // ---- INSTALLMENT GUARD ----
+  if (paymentMethod === 'credit' && creditType === 'partial') {
+  const paid = parseFloat(amountPaid) || 0;
+
+  if (paid <= 0 || paid >= total) {
+    toast.error('Partial credit must be greater than 0 and less than total');
+    return;
+  }
+}
+
+
   if (useInstallments) {
     const downPayment = parseFloat(amountPaid) || 0;
     if (downPayment < installmentPlan.downPayment) {
@@ -176,7 +188,7 @@ const handleCompleteSale = () => {
     }
   }
 
-  // ---- BUILD PAYMENT SCHEDULE (ONLY IF INSTALLMENTS) ----
+
   let paymentSchedule: InstallmentPayment[] = [];
 
   if (useInstallments) {
@@ -226,61 +238,91 @@ const handleCompleteSale = () => {
 
   }
 
-  // ---- TRANSACTION OBJECT ----
-  const transaction = {
-    id: transactionId,
-    customer,
-    items: cart,
-    subtotal,
-    tax,
-    total,
 
-    paymentMethod: useInstallments
-      ? 'installment'
-      : paymentMethod,
+ const transaction = {
+  id: transactionId,
+  customer,
+  items: cart,
+  subtotal,
+  tax,
+  total,
 
-    amountPaid:
-      paymentMethod === 'credit'
+  paymentMethod: useInstallments
+    ? 'installment'
+    : paymentMethod,
+
+  amountPaid:
+    paymentMethod === 'credit'
+      ? creditType === 'full'
         ? 0
-        : useInstallments
-        ? getActualDownPayment()
-        : parseFloat(amountPaid) || 0,
+        : parseFloat(amountPaid) || 0
+      : useInstallments
+      ? getActualDownPayment()
+      : parseFloat(amountPaid) || 0,
 
-    downPayment: useInstallments ? getActualDownPayment() : 0,
+ 
+  creditBalance:
+    paymentMethod === 'credit'
+      ? total -
+        (
+          creditType === 'full'
+            ? 0
+            : parseFloat(amountPaid) || 0
+        )
+      : 0,
 
-    change: paymentMethod === 'credit' ? 0 : calculateChange(),
+  creditType:
+    paymentMethod === 'credit'
+      ? creditType
+      : undefined,
 
-    timestamp,
-    synced: false,
-    purchaseType,
+  downPayment: useInstallments ? getActualDownPayment() : 0,
 
-    paymentStatus: useInstallments ? 'installment' : 'completed',
+  change: paymentMethod === 'credit' ? 0 : calculateChange(),
 
-    ...(useInstallments && {
-      installmentPlan: {
-        ...installmentPlan,
-        downPayment: getActualDownPayment(),
-        remainingBalance: getRemainingBalance(),
-        payments: paymentSchedule,
-      },
-    }),
+  timestamp,
+  synced: false,
+  purchaseType,
 
-    ...(paymentMethod === 'credit' && {
-      credit: {
-        waived: true,
-        issuedAt: timestamp,
-      },
-    }),
-  };
+  paymentStatus:
+    useInstallments
+      ? 'installment'
+      : paymentMethod === 'credit'
+      ? 'credit'
+      : 'completed',
 
-  // ---- SAVE TRANSACTION ----
+  ...(useInstallments && {
+    installmentPlan: {
+      ...installmentPlan,
+      downPayment: getActualDownPayment(),
+      remainingBalance: getRemainingBalance(),
+      payments: paymentSchedule,
+    },
+  }),
+
+  ...(paymentMethod === 'credit' && {
+    credit: {
+       issuedAt: timestamp,
+    creditType: creditType,
+    creditBalance: creditType === 'full' 
+      ? total 
+      : total - (parseFloat(amountPaid) || 0),
+    amountPaidTowardCredit: creditType === 'partial' 
+      ? (parseFloat(amountPaid) || 0)
+      : 0,
+    },
+  }),
+};
+
+
+
   const transactions = JSON.parse(
     localStorage.getItem('pos_transactions') || '[]'
   );
   transactions.push(transaction);
   localStorage.setItem('pos_transactions', JSON.stringify(transactions));
 
-  // ---- SAVE INSTALLMENT PLAN ----
+  
   if (useInstallments) {
     const installmentPlans = JSON.parse(
       localStorage.getItem('installment_plans') || '[]'
@@ -309,6 +351,13 @@ const handleCompleteSale = () => {
   setShowReceipt(true);
 };
 
+useEffect(() => {
+  if (paymentMethod === 'credit') {
+    setShowSplitPayment(false);
+  }
+}, [paymentMethod]);
+
+
 
   const calculateDueDate = (startDate: string, frequency: string, offset: number) => {
     const date = new Date(startDate);
@@ -327,7 +376,8 @@ const handleCompleteSale = () => {
   };
 
  const handlePrintReceipt = () => {
-    const transactionId = `txn_${Date.now()}`;
+    if (!transactionId) return;
+   
     
     const receiptHtml = ReactDOMServer.renderToString(
       <Receipt
@@ -337,8 +387,15 @@ const handleCompleteSale = () => {
         tax={tax}
         total={total}
         paymentMethod={useInstallments ? 'installment' : paymentMethod}
-        amountPaid={parseFloat(amountPaid) || 0}
-        change={calculateChange()}
+       amountPaid={
+        paymentMethod === 'credit'
+          ? creditType === 'full'
+            ? 0
+            : parseFloat(amountPaid) || 0
+          : parseFloat(amountPaid) || 0
+      }
+      change={paymentMethod === 'credit' ? 0 : calculateChange()}
+
         purchaseType={purchaseType}
         splitPayments={splitPayments}
         installmentPlan={useInstallments ? installmentPlan : undefined}
@@ -388,14 +445,14 @@ const handleCompleteSale = () => {
             .text-gray-900 { color: #111827; }
             .text-white { color: #ffffff; }
             .text-black { color: #000000; }
-            .text-yellow-300 { color: #fbbf24; }
-            .text-yellow-400 { color: #fbbf24; }
+            .text-green-400 { color: #fbbf24; }
+            .text-green-400 { color: #fbbf24; }
             .text-blue-400 { color: #60a5fa; }
             .text-green-800 { color: #166534; }
             .text-red-600 { color: #dc2626; }
-            .bg-yellow-300 { background-color: #fbbf24; }
-            .bg-yellow-500 { background-color: #eab308; }
-            .bg-yellow-900\/20 { background-color: rgba(120, 53, 15, 0.2); }
+            .bg-green-400 { background-color: #fbbf24; }
+            .bg-green-400 { background-color: #eab308; }
+            .bg-green-900\/20 { background-color: rgba(120, 53, 15, 0.2); }
             .bg-blue-900\/30 { background-color: rgba(30, 58, 138, 0.3); }
             .bg-green-50 { background-color: #f0fdf4; }
             .bg-gray-800 { background-color: #1f2937; }
@@ -406,7 +463,7 @@ const handleCompleteSale = () => {
             .border { border-width: 1px; }
             .border-gray-700 { border-color: #374151; }
             .border-gray-800 { border-color: #1f2937; }
-            .border-yellow-800\/30 { border-color: rgba(146, 64, 14, 0.3); }
+            .border-green-800\/30 { border-color: rgba(146, 64, 14, 0.3); }
             .overflow-hidden { overflow: hidden; }
             .grid { display: grid; }
             .grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -446,8 +503,8 @@ const handleCompleteSale = () => {
                 print-color-adjust: exact !important;
               }
               .no-print { display: none !important; }
-              .bg-yellow-300 { background-color: #facc15 !important; }
-              .bg-yellow-500 { background-color: #eab308 !important; }
+              .bg-green-400 { background-color: #facc15 !important; }
+              .bg-green-400 { background-color: #eab308 !important; }
               .bg-gray-800 { background-color: #f3f4f6 !important; }
               .bg-gray-900 { background-color: #ffffff !important; }
               .text-white { color: #000000 !important; }
@@ -570,7 +627,7 @@ useEffect(() => {
             tax={tax}
             total={total}
             paymentMethod={useInstallments ? 'installment' : paymentMethod}
-            amountPaid={parseFloat(amountPaid) || 0}
+           amountPaid={useInstallments ? getActualDownPayment() : parseFloat(amountPaid) || 0}
             change={calculateChange()}
             purchaseType={purchaseType}
             splitPayments={splitPayments}
@@ -671,10 +728,10 @@ useEffect(() => {
 
               
               {useInstallments && (
-                <div className="mt-2 p-3 bg-yellow-900/30 rounded-lg">
+                <div className="mt-2 p-3 bg-green-900/30 rounded-lg">
                   <div className="flex items-center justify-between">
                     <span className="text-sm">Installment Plan</span>
-                    <Badge variant="default" className="bg-yellow-500 text-black">
+                    <Badge variant="default" className="bg-green-400 text-black">
                       {installmentPlan.numberOfPayments} payments
                     </Badge>
                   </div>
@@ -709,7 +766,7 @@ useEffect(() => {
                 <div className="p-3 bg-gray-800 rounded-lg">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <Wallet className="h-5 w-5 text-yellow-400" />
+                    <Wallet className="h-5 w-5 text-green-400" />
                     <div>
                       <div className="font-medium">Installment Payment</div>
                       <div className="text-sm text-gray-400">
@@ -762,20 +819,59 @@ useEffect(() => {
                   </div>
                 )}
 
+                {paymentMethod === 'credit' && (
+  <div className="p-3 bg-gray-800 rounded-lg space-y-3">
+    <Label>Credit Type</Label>
+
+    <Tabs
+      value={creditType}
+      onValueChange={(v) => {
+        setCreditType(v as 'full' | 'partial');
+        if (v === 'full') setAmountPaid('0');
+      }}
+    >
+      <TabsList className="grid grid-cols-2 bg-gray-900">
+        <TabsTrigger value="full">Full Credit</TabsTrigger>
+        <TabsTrigger value="partial">Partial Credit</TabsTrigger>
+      </TabsList>
+    </Tabs>
+
+    {creditType === 'partial' && (
+      <div className="text-sm text-gray-400">
+        Customer pays part now, balance goes to credit
+      </div>
+    )}
+  </div>
+)}
+
+
 
             {paymentMethod === 'credit' && (
             <div className="p-4 bg-blue-900/30 rounded-lg">
               <div className="text-lg font-bold text-blue-400">
                 Credit Sale Approved
               </div>
-              <div className="text-sm mt-2">
-                Customer will not pay:
-                <span className="font-bold text-white">
-                  {' '}NGN {total.toFixed(2)}
-                </span>
+             <div className="text-sm mt-2">
+                {creditType === 'full' ? (
+                  <>
+                    Customer will not pay:
+                    <span className="font-bold text-white">
+                      {' '}NGN {total.toFixed(2)}
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    Customer owes:
+                    <span className="font-bold text-white">
+                      {' '}NGN {(total - (parseFloat(amountPaid) || 0)).toFixed(2)}
+                    </span>
+                  </>
+                )}
               </div>
               <div className="text-xs text-gray-400 mt-1">
-                No payment required 
+{creditType === 'full'
+  ? 'No payment required'
+  : 'Partial payment received'}
               </div>
             </div>
           )}
@@ -820,7 +916,7 @@ useEffect(() => {
                           onChange={(e) => handleAmountPaidChange(e.target.value)}
                           min={0}
                           step="0.01"
-                           disabled={paymentMethod === 'credit'}
+                          disabled={paymentMethod === 'credit' && creditType === 'full'}
                         />
                       </div>
 
@@ -837,6 +933,8 @@ useEffect(() => {
               </div>
             )}
 
+            
+
            
             {useInstallments && (
               <div className="space-y-3">
@@ -849,7 +947,7 @@ useEffect(() => {
                     </div>
                     <div>
                       <div className="text-sm text-gray-400">Required Down Payment</div>
-                      <div className="text-xl font-bold text-yellow-400">
+                      <div className="text-xl font-bold text-green-400">
                         NGN {installmentPlan.downPayment.toFixed(2)}
                       </div>
                     </div>
@@ -858,14 +956,43 @@ useEffect(() => {
                   <div className='flex flex-col gap-2'>
                     <Label htmlFor="installmentAmountPaid">Down Payment Amount</Label>
                     <Input
-                    id="installmentAmountPaid"
-                    type="number"
-                    value={amountPaid}
-                    onChange={(e) => handleAmountPaidChange(e.target.value)}
-                    min={installmentPlan.downPayment}
-                    max={total}
-                    step="0.01"
-                  />
+                      id="installmentAmountPaid"
+                      type="number"
+                      inputMode="decimal"
+                      value={amountPaid}
+                      
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        if (value === '') {
+                          setAmountPaid('');
+                          return;
+                        }
+
+                        if (!/^\d*\.?\d*$/.test(value)) return;
+                        
+                      
+                        const parts = value.split('.');
+                        
+                      
+                        if (parts[1] && parts[1].length > 2) return;
+                        
+                      
+                        let numValue = parseFloat(value);
+                        
+                      
+                        numValue = Math.min(numValue, total);
+                        
+                      
+                        const rounded = Math.round(numValue * 100) / 100;
+                        
+                        setAmountPaid(rounded.toFixed(2));
+                      }}
+                      placeholder={installmentPlan.downPayment.toFixed(2)}
+                      step="0.01"
+                      min="0"
+                      max={total}
+                    />
+
                   </div>
                   
                   {parseFloat(amountPaid) >= installmentPlan.downPayment && (
@@ -900,7 +1027,7 @@ useEffect(() => {
               Cancel Order
             </Button>
             <Button
-              className="bg-yellow-500 hover:bg-yellow-600 text-black"
+              className="bg-green-400 hover:bg-green-500 text-black"
               onClick={handleCompleteSale}
               disabled={useInstallments && parseFloat(amountPaid) < installmentPlan.downPayment}
             >
@@ -910,7 +1037,7 @@ useEffect(() => {
         </DialogContent>
       </Dialog>
 
-      {/* Split Payment Modal */}
+    
       <SplitPaymentModal
         open={showSplitPayment}
         onOpenChange={setShowSplitPayment}
@@ -1042,7 +1169,7 @@ function SplitPaymentModal({
 
         <DialogFooter>
           <Button
-            className="w-full bg-yellow-500 text-black"
+            className="w-full bg-green-400 text-black"
             onClick={() => {
               const totalPaid = splitPayments.reduce(
                 (sum, p) => sum + (parseFloat(p.amount) || 0),
@@ -1094,9 +1221,7 @@ const handleInputChange = <K extends keyof InstallmentPlan>(field: K, value: Ins
   }));
 };
 
-const [downPaymentPercent, setDownPaymentPercent] = useState(
-  Math.round((installmentPlan.downPayment / total) * 100)
-);
+
 
 
   const calculatePaymentSchedule = () => {
@@ -1176,7 +1301,7 @@ const [downPaymentPercent, setDownPaymentPercent] = useState(
                   {customer.email} • {customer.phone}
                 </div>
               </div>
-              <Badge variant="default" className="bg-yellow-500 text-black">
+              <Badge variant="default" className="bg-green-400 text-black">
                 Installment Plan
               </Badge>
             </div>
@@ -1184,30 +1309,32 @@ const [downPaymentPercent, setDownPaymentPercent] = useState(
 
          
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="downPayment">Down Payment (%)</Label>
-            <Input
-                  id="downPayment"
-                  type="number"
-                  min={10}
-                  max={90}
-                  value={isNaN(downPaymentPercent) ? '' : downPaymentPercent}
-                  onChange={(e) => {
-                    const percent = Number(e.target.value);
-                    if (isNaN(percent)) return;
+          <div className="space-y-2">
+  <Label htmlFor="downPayment">Down Payment Amount</Label>
+  <Input
+    id="downPayment"
+    type="number"
+    min={0}
+    max={total}
+    step="0.01"
+    value={installmentPlan.downPayment}
+    onChange={(e) => {
+      const value = Math.min(
+        Math.max(parseFloat(e.target.value) || 0, 0),
+        total
+      );
 
-                    setDownPaymentPercent(percent);
-
-                    const safeTotal = total || 0;
-                    const safePercent = percent || 0;
-                    const downPayment = Math.ceil((safeTotal * safePercent) / 100);
-                    handleInputChange('downPayment', downPayment);
-                  }}
-                />
-              <div className="text-sm text-gray-400">
-                Minimum: 10% | Recommended: 30%
-              </div>
-            </div>
+      setInstallmentPlan((prev) => ({
+        ...prev,
+        downPayment: value,
+        remainingBalance: Math.max(total - value, 0),
+      }));
+    }}
+  />
+  <div className="text-sm text-gray-400">
+    Remaining balance: NGN {(total - installmentPlan.downPayment).toFixed(2)}
+  </div>
+</div>
 
             <div className="space-y-2">
               <Label htmlFor="numberOfPayments">Number of Payments</Label>
@@ -1270,7 +1397,7 @@ const [downPaymentPercent, setDownPaymentPercent] = useState(
               </div>
               <div>
                 <div className="text-sm text-gray-400">Down Payment</div>
-                <div className="text-xl font-bold text-yellow-400">
+                <div className="text-xl font-bold text-green-400">
                   NGN {installmentPlan.downPayment.toFixed(2)}
                 </div>
               </div>
@@ -1327,7 +1454,7 @@ const [downPaymentPercent, setDownPaymentPercent] = useState(
                       <td className="p-3">
                         <Badge 
                           variant={payment.type === 'down_payment' ? 'default' : 'secondary'}
-                          className={payment.type === 'down_payment' ? 'bg-yellow-500 text-black' : ''}
+                          className={payment.type === 'down_payment' ? 'bg-green-400 text-black' : ''}
                         >
                           {payment.type === 'down_payment'
                             ? 'Down Payment'
@@ -1359,7 +1486,7 @@ const [downPaymentPercent, setDownPaymentPercent] = useState(
             Cancel
           </Button>
           <Button
-            className="bg-yellow-500 hover:bg-yellow-600 text-black"
+            className="bg-green-400 hover:bg-green-500 text-black"
             onClick={() => onOpenChange(false)}
           >
             Confirm Installment Plan

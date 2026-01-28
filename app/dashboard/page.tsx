@@ -199,7 +199,7 @@ const handleRejectLogin = (id: string) => {
               <div className="flex items-center justify-between mb-6">
                 <div>
                   <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                    <BarChart3 className="h-5 w-5 text-yellow-600" />
+                    <BarChart3 className="h-5 w-5 text-green-500" />
                     Income vs Expenses
                   </h3>
                   <p className="text-sm text-gray-800">Monthly comparison</p>
@@ -225,7 +225,7 @@ const handleRejectLogin = (id: string) => {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-2 sm:gap-0">
         <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
           <h3 className="text-lg sm:text-xl font-semibold text-gray-900 flex items-center gap-2">
-            <PieChartIcon className="h-5 w-5 text-yellow-600" />
+            <PieChartIcon className="h-5 w-5 text-green-500" />
             Sales by Category
           </h3>
           <p className="text-sm sm:text-base text-gray-800">Revenue distribution</p>
@@ -388,8 +388,8 @@ const handleRejectLogin = (id: string) => {
                     Approved
                   </span>
                 ) : login.status === 'pending' ? (
-                  <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-yellow-900/30 text-yellow-300 border border-yellow-700/50">
-                    <span className="h-1.5 w-1.5 rounded-full bg-yellow-400 mr-2"></span>
+                  <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-900/30 text-green-400 border border-green-700/50">
+                    <span className="h-1.5 w-1.5 rounded-full bg-green-400 mr-2"></span>
                     Pending
                   </span>
                 ) : (
@@ -489,9 +489,9 @@ const handleRejectLogin = (id: string) => {
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm text-gray-400">Pending Approval</p>
-            <p className="text-2xl font-semibold text-yellow-300">2</p>
+            <p className="text-2xl font-semibold text-green-400">2</p>
           </div>
-          <div className="h-10 w-10 rounded-full bg-yellow-900/30 flex items-center justify-center">
+          <div className="h-10 w-10 rounded-full bg-green-900/30 flex items-center justify-center">
             <span className="text-lg">⏳</span>
           </div>
         </div>

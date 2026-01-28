@@ -28,7 +28,7 @@ export function Header({ onMenuClick }: HeaderProps) {
           <div className="hidden md:block">
             <div className="relative">
              <Link href="/dashboard" className="flex items-center gap-3">
-          <div className="h-8 w-8 bg-yellow-300 rounded-lg flex items-center justify-center">
+          <div className="h-8 w-8 bg-green-400 rounded-lg flex items-center justify-center">
             <span className="text-black font-bold text-sm">BMT</span>
           </div>
           <div>
@@ -63,8 +63,8 @@ export function Header({ onMenuClick }: HeaderProps) {
           </Link>
           
           <div className="hidden md:flex items-center gap-3 px-3 py-2 rounded-lg bg-gray-800">
-            <div className="h-8 w-8 rounded-full bg-yellow-300/10 flex items-center justify-center">
-              <span className="text-yellow-300 font-bold text-sm">AD</span>
+            <div className="h-8 w-8 rounded-full bg-green-400/10 flex items-center justify-center">
+              <span className="text-green-400 font-bold text-sm">AD</span>
             </div>
             <div>
               <div className="text-sm font-medium text-white">Admin Dashboard</div>

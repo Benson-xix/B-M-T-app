@@ -32,7 +32,7 @@ export function DashboardTabs({ activeTab, onTabChange, children }: DashboardTab
                   px-4 py-2.5 md:py-3
                   text-sm md:text-base
                   whitespace-nowrap
-                  data-[state=active]:bg-yellow-300 
+                  data-[state=active]:bg-green-400 
                   data-[state=active]:text-black 
                   data-[state=active]:font-bold
                   data-[state=active]:shadow-lg

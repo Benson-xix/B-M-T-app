@@ -42,7 +42,7 @@ const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
         <p className="text-white font-medium">{label}</p>
         <p className="text-green-400">Income: NGN {income.toLocaleString()}</p>
         <p className="text-red-400">Expenses: NGN {expenses.toLocaleString()}</p>
-        <p className="text-yellow-300">
+        <p className="text-green-400">
           Net: NGN {(income - expenses).toLocaleString()}
         </p>
       </div>

@@ -211,12 +211,12 @@ function printInstallmentReceipt(params: {
               background: white !important;
               color: black !important;
             }
-            .bg-yellow-300 { background-color: #facc15 !important; }
-            .bg-yellow-900\/20 { background-color: rgba(120, 53, 15, 0.2) !important; }
+            .bg-green-400 { background-color: #facc15 !important; }
+            .bg-green-900\/20 { background-color: rgba(120, 53, 15, 0.2) !important; }
             .text-gray-100 { color: #000 !important; }
             .text-gray-300 { color: #000 !important; }
             .text-gray-400 { color: #666 !important; }
-            .text-yellow-300 { color: #92400e !important; }
+            .text-green-400 { color: #92400e !important; }
           }
         </style>
       </head>
@@ -376,12 +376,12 @@ function printInstallmentReceiptFromTransaction(
               background: white !important;
               color: black !important;
             }
-            .bg-yellow-300 { background-color: #facc15 !important; }
-            .bg-yellow-900\/20 { background-color: rgba(120, 53, 15, 0.2) !important; }
+            .bg-green-400 { background-color: #facc15 !important; }
+            .bg-green-900\/20 { background-color: rgba(120, 53, 15, 0.2) !important; }
             .text-gray-100 { color: #000 !important; }
             .text-gray-300 { color: #000 !important; }
             .text-gray-400 { color: #666 !important; }
-            .text-yellow-300 { color: #92400e !important; }
+            .text-green-400 { color: #92400e !important; }
           }
         </style>
       </head>
@@ -718,7 +718,7 @@ localStorage.setItem(
 
     const variants = {
       paid: { label: 'Paid', color: 'bg-green-100 text-green-800' },
-      pending: { label: 'Pending', color: 'bg-yellow-100 text-yellow-800' },
+      pending: { label: 'Pending', color: 'bg-yellow-100 text-green-800' },
       overdue: { label: 'Overdue', color: 'bg-red-100 text-red-800' },
       partial: { label: 'Partial', color: 'bg-orange-100 text-orange-800' },
 
@@ -1128,7 +1128,7 @@ const paginatedInstallments = sortedInstallments.slice(
         Cancel
       </Button>
       <Button
-        className="bg-yellow-500 text-black"
+        className="bg-green-400 text-black"
         onClick={handleRecordPayment}
       >
         Save Payment

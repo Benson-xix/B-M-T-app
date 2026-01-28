@@ -533,8 +533,8 @@ const paginatedStaffs = staffs.slice(
                   </div>
                   
                   {newStaff.sendCredentials && (
-                    <Alert className="bg-yellow-50 border-yellow-200">
-                      <AlertDescription className="text-yellow-800 text-sm">
+                    <Alert className="bg-yellow-50 border-green-200">
+                      <AlertDescription className="text-green-800 text-sm">
                         <AlertCircle className="w-4 h-4 inline mr-2" />
                         An email with login credentials will be sent to {newStaff.email || 'the staff email'}
                       </AlertDescription>
@@ -743,7 +743,7 @@ function KPICard({
             <p className="text-sm text-gray-500 mt-1">{description}</p>
           </div>
           <div className="p-3 bg-yellow-50 rounded-lg">
-            <div className="text-yellow-600">{icon}</div>
+            <div className="text-green-500">{icon}</div>
           </div>
         </div>
       </CardContent>

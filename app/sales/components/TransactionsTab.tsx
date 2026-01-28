@@ -91,7 +91,7 @@ export function TransactionsTab({
       'cash': { label: 'Cash', color: 'bg-green-100 text-green-800' },
       'card': { label: 'Card', color: 'bg-blue-100 text-blue-800' },
       'transfer': { label: 'Transfer', color: 'bg-purple-100 text-purple-800' },
-      'credit': { label: 'Credit', color: 'bg-yellow-100 text-yellow-800' },
+      'credit': { label: 'Credit', color: 'bg-yellow-100 text-green-800' },
       'installment': { label: 'Installment', color: 'bg-indigo-100 text-indigo-800' },
       'split': { label: 'Split', color: 'bg-pink-100 text-pink-800' },
     };
@@ -248,6 +248,9 @@ export function TransactionsTab({
     { value: 'split', label: 'Split' },
   ];
 
+  const creditTransactions = filteredTransactions.filter(t => t.paymentMethod === 'credit');
+
+
   
 
   return (
@@ -338,6 +341,7 @@ export function TransactionsTab({
                   <TableHead>Amount</TableHead>
                   <TableHead>Sale Made By</TableHead>
                   <TableHead>Status</TableHead>
+                  <TableHead>Credit Status</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -380,6 +384,25 @@ export function TransactionsTab({
                         {transaction.synced ? 'Synced' : 'Unsynced'}
                       </Badge>
                     </TableCell>
+                     <TableCell>
+                    {transaction.paymentMethod === 'credit' && (
+                     
+                        <div className="space-y-1">
+                          <Badge className="bg-blue-600 text-white block">
+                            Credit (Waived)
+                          </Badge>
+                          {transaction.credit?.creditType === 'partial' && (
+                            <Badge className="bg-amber-600 text-white text-xs">
+                              Partial: NGN {transaction.credit.amountPaidTowardCredit.toFixed(2)}
+                            </Badge>
+                          )}
+                          <div className="text-xs text-gray-500 mt-1">
+                            Balance: NGN {transaction.credit?.creditBalance.toFixed(2)}
+                          </div>
+                        </div>
+                     
+                    )}
+                     </TableCell>
                     <TableCell className="text-right">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -428,7 +451,7 @@ export function TransactionsTab({
                       variant={currentPage === page ? "default" : "outline"}
                       size="sm"
                       onClick={() => setCurrentPage(page)}
-                      className={currentPage === page ? 'bg-yellow-500 hover:bg-yellow-600 text-black' : ''}
+                      className={currentPage === page ? 'bg-green-400 hover:bg-green-500 text-black' : ''}
                     >
                       {page}
                     </Button>

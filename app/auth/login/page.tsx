@@ -45,7 +45,7 @@ export default function LoginPage() {
           <div className="text-center">
             <Link 
               href="/auth/forgot-password" 
-              className="text-yellow-300 hover:text-yellow-400 hover:underline transition-colors text-sm"
+              className="text-green-400 hover:text-green-400 hover:underline transition-colors text-sm"
             >
               Forgot your password?
             </Link>
@@ -54,7 +54,7 @@ export default function LoginPage() {
             Don&apos;t have an account?{' '}
             <Link 
               href="/auth/register" 
-              className="text-yellow-300 hover:text-yellow-400 hover:underline transition-colors font-medium"
+              className="text-green-400 hover:text-green-400 hover:underline transition-colors font-medium"
             >
               Request Access
             </Link>
@@ -78,7 +78,7 @@ export default function LoginPage() {
                     <Input 
                       type="email" 
                       placeholder="admin@bigmentransaction.com" 
-                      className="bg-gray-900/50 border-gray-700 text-white pl-10 h-11 rounded-lg focus:border-yellow-300 focus:ring-yellow-300/20"
+                      className="bg-gray-900/50 border-gray-700 text-white pl-10 h-11 rounded-lg focus:border-green-400 focus:ring-green-400/20"
                       {...field} 
                     />
                   </div>
@@ -102,7 +102,7 @@ export default function LoginPage() {
                     <Input 
                       type="password" 
                       placeholder="Enter your password" 
-                      className="bg-gray-900/50 border-gray-700 text-white pl-10 h-11 rounded-lg focus:border-yellow-300 focus:ring-yellow-300/20"
+                      className="bg-gray-900/50 border-gray-700 text-white pl-10 h-11 rounded-lg focus:border-green-400 focus:ring-green-400/20"
                       {...field} 
                     />
                   </div>
@@ -114,7 +114,7 @@ export default function LoginPage() {
           
           <Button 
             type="submit" 
-            className="w-full bg-yellow-300 hover:bg-yellow-400 text-black font-bold h-11 rounded-lg transition-all duration-300 transform hover:scale-[1.02] active:scale-95 shadow-lg hover:shadow-xl shadow-yellow-300/20"
+            className="w-full bg-green-400 hover:bg-green-400 text-black font-bold h-11 rounded-lg transition-all duration-300 transform hover:scale-[1.02] active:scale-95 shadow-lg hover:shadow-xl shadow-green-400/20"
             disabled={loading}
           >
             {loading ? (

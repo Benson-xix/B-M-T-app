@@ -53,11 +53,11 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         
         <div className="flex items-center justify-between h-16 px-6 border-b border-gray-800 shrink-0">
           <Link href="/dashboard" className="flex items-center gap-3" onClick={onClose}>
-            <div className="h-8 w-8 bg-yellow-300 rounded-lg flex items-center justify-center">
+            <div className="h-8 w-8 bg-green-400 rounded-lg flex items-center justify-center">
               <span className="text-black font-bold text-sm">BMT</span>
             </div>
             <div>
-              <div className="font-bold text-white text-lg">Big Men</div>
+              <div className="font-bold text-white text-lg">Big Men</div> 
               <div className="text-xs text-gray-400 -mt-1">Transaction Apparel</div>
             </div>
           </Link>
@@ -85,7 +85,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                   className={cn(
                     "flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors",
                     isActive
-                      ? "bg-yellow-300 text-black"
+                      ? "bg-green-400 text-black"
                       : "text-gray-300 hover:bg-gray-800 hover:text-white"
                   )}
                 >
@@ -100,8 +100,8 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         
         <div className="p-4 border-t border-gray-800 shrink-0">
           <div className="flex items-center gap-3 px-4 py-3">
-            <div className="h-9 w-9 rounded-full bg-yellow-300/10 flex items-center justify-center">
-              <span className="text-yellow-300 font-bold">AD</span>
+            <div className="h-9 w-9 rounded-full bg-green-400/10 flex items-center justify-center">
+              <span className="text-green-400 font-bold">AD</span>
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-white truncate">Admin User</p>

@@ -207,7 +207,7 @@ const selectedVariantData: ProductVariant = product.hasVariations
             <Button  type="button" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>
-            <Button type="submit" className="bg-yellow-500 hover:bg-yellow-600 text-black">
+            <Button type="submit" className="bg-green-400 hover:bg-green-500 text-black">
               Update Stock
             </Button>
           </DialogFooter>

@@ -6,9 +6,9 @@ export default function Home() {
     <main className="min-h-screen bg-linear-to-br from-black via-gray-900 to-black p-4 md:p-8 lg:p-24 overflow-x-hidden">
      
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-20 -right-20 md:-top-40 md:-right-40 w-40 h-40 md:w-80 md:h-80 bg-yellow-300/10 rounded-full blur-2xl md:blur-3xl"></div>
-        <div className="absolute -bottom-20 -left-20 md:-bottom-40 md:-left-40 w-40 h-40 md:w-80 md:h-80 bg-yellow-300/5 rounded-full blur-2xl md:blur-3xl"></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-48 h-48 md:w-96 md:h-96 bg-yellow-300/3 rounded-full blur-2xl md:blur-3xl"></div>
+        <div className="absolute -top-20 -right-20 md:-top-40 md:-right-40 w-40 h-40 md:w-80 md:h-80 bg-green-400/10 rounded-full blur-2xl md:blur-3xl"></div>
+        <div className="absolute -bottom-20 -left-20 md:-bottom-40 md:-left-40 w-40 h-40 md:w-80 md:h-80 bg-green-400/5 rounded-full blur-2xl md:blur-3xl"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-48 h-48 md:w-96 md:h-96 bg-green-400/3 rounded-full blur-2xl md:blur-3xl"></div>
         
        
         <div className="absolute inset-0 opacity-5">
@@ -22,14 +22,14 @@ export default function Home() {
        
         <div className="w-full text-center mb-8 md:mb-16">
           <div className="inline-flex items-center justify-center gap-3 md:gap-6 mb-4">
-            <div className="hidden sm:block w-1.5 h-8 md:w-2 md:h-12 bg-yellow-300 rounded-full"></div>
+            <div className="hidden sm:block w-1.5 h-8 md:w-2 md:h-12 bg-green-400 rounded-full"></div>
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white tracking-tighter">
-              <span className="text-yellow-300">BIG MEN</span>
+              <span className="text-green-400">BIG MEN</span>
               <span className="block text-lg sm:text-xl md:text-2xl lg:text-3xl font-medium text-gray-300 mt-1 md:mt-2">
                 TRANSACTION APPAREL
               </span>
             </h1>
-            <div className="hidden sm:block w-1.5 h-8 md:w-2 md:h-12 bg-yellow-300 rounded-full"></div>
+            <div className="hidden sm:block w-1.5 h-8 md:w-2 md:h-12 bg-green-400 rounded-full"></div>
           </div>
           <p className="text-gray-400 uppercase tracking-[0.3em] text-xs md:text-sm">
             ADMIN COMMAND CENTER
@@ -41,10 +41,10 @@ export default function Home() {
           <div className="mb-8 md:mb-12">
             <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 md:mb-6">
               Welcome to the
-              <span className="block text-yellow-300 mt-2 md:mt-3">
+              <span className="block text-green-400 mt-2 md:mt-3">
                 <span className="relative">
                   Executive Control
-                  <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-yellow-300/50"></span>
+                  <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-green-400/50"></span>
                 </span>
               </span>
             </h2>
@@ -64,10 +64,10 @@ export default function Home() {
             ].map((item, index) => (
               <div 
                 key={index} 
-                className="text-center p-3 sm:p-4 bg-gray-900/40 backdrop-blur-sm rounded-xl md:rounded-2xl border border-gray-800 hover:border-yellow-300/30 transition-all duration-300 hover:scale-[1.02]"
+                className="text-center p-3 sm:p-4 bg-gray-900/40 backdrop-blur-sm rounded-xl md:rounded-2xl border border-gray-800 hover:border-green-400/30 transition-all duration-300 hover:scale-[1.02]"
               >
                 <div className="text-lg sm:text-xl mb-1">{item.icon}</div>
-                <div className="text-xl sm:text-2xl md:text-3xl font-bold text-yellow-300 mb-1">{item.value}</div>
+                <div className="text-xl sm:text-2xl md:text-3xl font-bold text-green-400 mb-1">{item.value}</div>
                 <div className="text-xs sm:text-sm text-gray-400 uppercase tracking-wider leading-tight">{item.label}</div>
               </div>
             ))}
@@ -78,7 +78,7 @@ export default function Home() {
         <div className="flex flex-col items-center gap-6 md:gap-8 w-full max-w-md px-4">
           <Button 
             asChild
-            className="group w-full max-w-xs sm:max-w-sm px-6 py-6 sm:px-12 sm:py-6 bg-yellow-300 hover:bg-yellow-400 text-black font-bold text-base sm:text-lg rounded-xl hover:rounded-2xl transition-all duration-300 transform hover:scale-[1.02] active:scale-95 shadow-lg hover:shadow-xl shadow-yellow-300/20 h-auto"
+            className="group w-full max-w-xs sm:max-w-sm px-6 py-6 sm:px-12 sm:py-6 bg-green-400 hover:bg-green-400 text-black font-bold text-base sm:text-lg rounded-xl hover:rounded-2xl transition-all duration-300 transform hover:scale-[1.02] active:scale-95 shadow-lg hover:shadow-xl shadow-green-400/20 h-auto"
           >
             <Link href="/auth/login" className="w-full">
              
@@ -96,7 +96,7 @@ export default function Home() {
             <span className="text-xs sm:text-sm">Need administrator access?</span>
             <Link 
               href="/auth/register"
-              className="text-yellow-300 hover:text-yellow-400 text-sm font-medium hover:underline transition-colors flex items-center gap-1"
+              className="text-green-400 hover:text-green-400 text-sm font-medium hover:underline transition-colors flex items-center gap-1"
             >
               Request Credentials
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -131,8 +131,8 @@ export default function Home() {
      
       <div className="fixed bottom-4 right-4 md:bottom-8 md:right-8">
         <div className="relative">
-          <div className="w-24 h-24 md:w-32 md:h-32 border border-yellow-300/20 rounded-full animate-spin-slow"></div>
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-12 h-12 md:w-20 md:h-20 border border-yellow-300/10 rounded-full"></div>
+          <div className="w-24 h-24 md:w-32 md:h-32 border border-green-400/20 rounded-full animate-spin-slow"></div>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-12 h-12 md:w-20 md:h-20 border border-green-400/10 rounded-full"></div>
         </div>
       </div>
 

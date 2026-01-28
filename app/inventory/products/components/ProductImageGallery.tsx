@@ -75,7 +75,7 @@ export function ProductImageGallery({
             key={index}
             className={`aspect-square rounded-md overflow-hidden border-2 transition-all ${
               mainImage === image
-                ? 'border-yellow-500 ring-2 ring-yellow-500/20'
+                ? 'border-green-400 ring-2 ring-green-400/20'
                 : 'border-gray-200 hover:border-gray-300'
             }`}
             onClick={() => onVariantImageClick(image)}

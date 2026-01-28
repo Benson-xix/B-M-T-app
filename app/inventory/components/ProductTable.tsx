@@ -96,7 +96,7 @@ export function ProductTable({ searchQuery }: { searchQuery: string }) {
   const getStatusBadge = (status: string) => {
     const variants = {
       'in-stock': { label: 'In Stock', color: 'bg-green-100 text-green-800' },
-      'low-stock': { label: 'Low Stock', color: 'bg-yellow-100 text-yellow-800' },
+      'low-stock': { label: 'Low Stock', color: 'bg-yellow-100 text-green-800' },
       'out-of-stock': { label: 'Out of Stock', color: 'bg-red-100 text-red-800' }
     };
     const variant = variants[status as keyof typeof variants];

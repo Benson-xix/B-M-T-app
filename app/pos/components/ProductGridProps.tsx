@@ -147,7 +147,7 @@ const getStockStatus = (
                         className={`flex items-center gap-1 ${
                           variant.quantity === 0
                             ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                            : 'bg-yellow-500 hover:bg-yellow-600 text-black'
+                            : 'bg-green-400 hover:bg-green-500 text-black'
                         }`}
                         onClick={() => onAddToCart(variant, product)}
                         disabled={variant.quantity === 0}

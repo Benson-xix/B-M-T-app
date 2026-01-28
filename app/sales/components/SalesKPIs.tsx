@@ -23,6 +23,13 @@ export function SalesKPIs({ transactions }: SalesKPIsProps) {
   const totalOrders = transactions.length;
   const totalAmount = transactions.reduce((sum, t) => sum + t.total, 0);
   const totalDiscount = transactions.reduce((sum, t) => sum + (t.discount || 0), 0);
+
+
+  const creditTransactions = transactions.filter(t => t.paymentMethod === 'credit');
+const totalCreditValue = creditTransactions.reduce((sum, t) => sum + t.total, 0);
+const fullCreditCount = creditTransactions.filter(t => t.credit?.creditType === 'full').length;
+const partialCreditCount = creditTransactions.filter(t => t.credit?.creditType === 'partial').length;
+
   
   
   const paymentMethods = transactions.reduce((acc, t) => {
@@ -167,30 +174,63 @@ export function SalesKPIs({ transactions }: SalesKPIsProps) {
                   case 'cash': return 'bg-green-100 text-green-800';
                   case 'card': return 'bg-blue-100 text-blue-800';
                   case 'transfer': return 'bg-purple-100 text-purple-800';
-                  case 'credit': return 'bg-yellow-100 text-yellow-800';
+                  case 'credit': return 'bg-yellow-100 text-green-800';
                   case 'installment': return 'bg-indigo-100 text-indigo-800';
                   case 'split': return 'bg-pink-100 text-pink-800';
                   default: return 'bg-gray-100 text-gray-800';
                 }
               };
               
-              return (
-                <div key={method} className="flex flex-col items-center p-1 bg-gray-50 rounded-lg">
-                  <div className="flex items-center gap-2 mb-1">
-                    {getMethodIcon(method)}
-                    <span className="xl:font-medium lg:text-[10px] xl:text-[14px] xl:capitalize">{method}</span>
-                  </div>
-                  <div className="text-2xl font-bold mb-1">{count}</div>
-                  <Badge variant="secondary" className={getMethodColor(method)}>
-                    {percentage}%
-                  </Badge>
-                  <div className="text-sm text-gray-500 mt-1">
-                    {method === 'installment' ? 'Installment Plans' : 
-                     method === 'credit' ? 'Credit (Waived)' : 
-                     `${method.charAt(0).toUpperCase()}${method.slice(1)}`}
-                  </div>
-                </div>
-              );
+              return method === 'credit' ? (
+  <div
+    key={method}
+    className="flex flex-col items-center p-2 bg-blue-50 rounded-lg border border-blue-200"
+  >
+    <div className="flex items-center gap-2 mb-2">
+      {getMethodIcon(method)}
+      <span className="font-medium capitalize">{method}</span>
+    </div>
+
+    <div className="text-2xl font-bold mb-2">{count}</div>
+
+    <div className="text-xs text-gray-600 space-y-1 text-center">
+      <div>Full: {fullCreditCount}</div>
+      <div>Partial: {partialCreditCount}</div>
+    </div>
+
+    <Badge
+      variant="secondary"
+      className="bg-blue-100 text-blue-800 mt-2"
+    >
+      {percentage}%
+    </Badge>
+  </div>
+) : (
+  <div
+    key={method}
+    className="flex flex-col items-center p-1 bg-gray-50 rounded-lg"
+  >
+    <div className="flex items-center gap-2 mb-1">
+      {getMethodIcon(method)}
+      <span className="xl:font-medium lg:text-[10px] xl:text-[14px] xl:capitalize">
+        {method}
+      </span>
+    </div>
+
+    <div className="text-2xl font-bold mb-1">{count}</div>
+
+    <Badge variant="secondary" className={getMethodColor(method)}>
+      {percentage}%
+    </Badge>
+
+    <div className="text-sm text-gray-500 mt-1">
+      {method === 'installment'
+        ? 'Installment Plans'
+        : `${method.charAt(0).toUpperCase()}${method.slice(1)}`}
+    </div>
+  </div>
+);
+
             })}
           </div>
         </CardContent>

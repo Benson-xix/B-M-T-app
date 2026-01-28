@@ -134,7 +134,11 @@ export interface Transaction {
   installmentPlan?: InstallmentPlan;
   splitPayments?: { method: string; amount: number }[];
   credit?:  {
-  waived: true
+  waived: true;
+  issuedAt: string;
+    creditType: 'full' | 'partial';
+    creditBalance: number; 
+    amountPaidTowardCredit: number; 
 }
 }
 

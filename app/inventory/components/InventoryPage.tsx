@@ -31,7 +31,7 @@ export  function InventoryPage() {
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="relative">
               <Link href="/dashboard" className="flex items-center gap-3">
-          <div className="h-8 w-8 bg-yellow-300 rounded-lg flex items-center justify-center">
+          <div className="h-8 w-8 bg-green-400 rounded-lg flex items-center justify-center">
             <span className="text-black font-bold text-sm">BMT</span>
           </div>
           <div>
@@ -46,7 +46,7 @@ export  function InventoryPage() {
             Filter
           </Button>
           
-          <Button className="flex items-center gap-2 bg-yellow-500 hover:bg-yellow-600 text-black">
+          <Button className="flex items-center gap-2 bg-green-400 hover:bg-green-500 text-black">
             <Download className="h-4 w-4" />
             Export
           </Button>

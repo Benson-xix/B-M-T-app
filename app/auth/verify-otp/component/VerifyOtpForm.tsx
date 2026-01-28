@@ -73,7 +73,7 @@ export default function VerifyOtpForm() {
                     </svg>
                     <Input 
                       placeholder="123456" 
-                      className="bg-gray-900/50 border-gray-700 text-white pl-10 h-11 rounded-lg focus:border-yellow-300 focus:ring-yellow-300/20 text-center tracking-widest text-lg"
+                      className="bg-gray-900/50 border-gray-700 text-white pl-10 h-11 rounded-lg focus:border-green-400 focus:ring-green-400/20 text-center tracking-widest text-lg"
                       maxLength={6}
                       {...field} 
                       onChange={(e) => {
@@ -85,7 +85,7 @@ export default function VerifyOtpForm() {
                 </FormControl>
                 <div className="text-gray-500 text-xs mt-1 flex justify-between">
                   <span>• Enter the 6-digit code</span>
-                  <span className="text-yellow-300">{field.value?.length || 0}/6</span>
+                  <span className="text-green-400">{field.value?.length || 0}/6</span>
                 </div>
                 <FormMessage className="text-red-400 text-xs" />
               </FormItem>
@@ -100,11 +100,11 @@ export default function VerifyOtpForm() {
               size="sm"
               onClick={handleResend}
               disabled={resendLoading}
-              className="text-yellow-300 hover:text-yellow-400 hover:bg-yellow-300/10 text-sm"
+              className="text-green-400 hover:text-green-400 hover:bg-green-400/10 text-sm"
             >
               {resendLoading ? (
                 <span className="flex items-center gap-2">
-                  <div className="w-3 h-3 border border-yellow-300 border-t-transparent rounded-full animate-spin"></div>
+                  <div className="w-3 h-3 border border-green-400 border-t-transparent rounded-full animate-spin"></div>
                   Sending...
                 </span>
               ) : (
@@ -127,7 +127,7 @@ export default function VerifyOtpForm() {
           
           <Button 
             type="submit" 
-            className="w-full bg-yellow-300 hover:bg-yellow-400 text-black font-bold h-11 rounded-lg transition-all duration-300 transform hover:scale-[1.02] active:scale-95 shadow-lg hover:shadow-xl shadow-yellow-300/20"
+            className="w-full bg-green-400 hover:bg-green-400 text-black font-bold h-11 rounded-lg transition-all duration-300 transform hover:scale-[1.02] active:scale-95 shadow-lg hover:shadow-xl shadow-green-400/20"
             disabled={loading}
           >
             {loading ? (

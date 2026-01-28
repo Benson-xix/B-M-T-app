@@ -581,8 +581,8 @@ const paginatedRoles = roles.slice(
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                  <Alert className="bg-yellow-50 border-yellow-200">
-                    <AlertDescription className="text-yellow-800">
+                  <Alert className="bg-yellow-50 border-green-200">
+                    <AlertDescription className="text-green-800">
                       <CheckCircle className="w-4 h-4 inline mr-2" />
                       Password must be at least 8 characters long
                     </AlertDescription>
@@ -744,7 +744,7 @@ const paginatedRoles = roles.slice(
                                       onCheckedChange={(checked) => toggleGroupPermissions(groupPermissions, checked as boolean)}
                                       className={
                                         isPartial 
-                                          ? "data-[state=checked]:bg-yellow-500 data-[state=checked]:border-yellow-500" 
+                                          ? "data-[state=checked]:bg-green-400 data-[state=checked]:border-green-400" 
                                           : ""
                                       }
                                     />
@@ -827,7 +827,7 @@ const paginatedRoles = roles.slice(
                                 <div className="w-2 h-2 rounded-full bg-gray-900"></div>
                                 {role.name}
                                 {role.name === 'Administrator' && (
-                                  <Badge className="bg-yellow-100 text-yellow-800 text-xs">
+                                  <Badge className="bg-yellow-100 text-green-800 text-xs">
                                     Default
                                   </Badge>
                                 )}
@@ -974,7 +974,7 @@ const paginatedRoles = roles.slice(
                               onCheckedChange={(checked) => toggleGroupPermissions(groupPermissions, checked as boolean)}
                               className={
                                 isPartial 
-                                  ? "data-[state=checked]:bg-yellow-500 data-[state=checked]:border-yellow-500" 
+                                  ? "data-[state=checked]:bg-green-400 data-[state=checked]:border-green-400" 
                                   : ""
                               }
                             />

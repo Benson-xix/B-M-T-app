@@ -120,7 +120,7 @@ export function ProductDescriptionTab({ product }: ProductDescriptionTabProps) {
               </div>
               
               <Button 
-                className="w-full bg-yellow-500 hover:bg-yellow-600 text-black mt-4"
+                className="w-full bg-green-400 hover:bg-green-500 text-black mt-4"
                 onClick={() => setShowAdjustStockModal(true)}
               >
                 Adjust Stock

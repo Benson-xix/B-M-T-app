@@ -338,8 +338,8 @@ export default function StaffDetailPage() {
                 </DialogHeader>
                 
                 <div className="space-y-4 py-4">
-                  <Alert className="bg-yellow-50 border-yellow-200">
-                    <AlertDescription className="text-yellow-800 text-sm">
+                  <Alert className="bg-yellow-50 border-green-200">
+                    <AlertDescription className="text-green-800 text-sm">
                       <AlertCircle className="w-4 h-4 inline mr-2" />
                       Staff will need to use new credentials for next login
                     </AlertDescription>
@@ -575,8 +575,8 @@ export default function StaffDetailPage() {
                     </div>
                   </div>
                   
-                  <Alert className="bg-yellow-50 border-yellow-200">
-                    <AlertDescription className="text-yellow-800">
+                  <Alert className="bg-yellow-50 border-green-200">
+                    <AlertDescription className="text-green-800">
                       <CheckCircle className="w-4 h-4 inline mr-2" />
                       Permissions are managed through the role. To change permissions, edit the role in Settings.
                     </AlertDescription>

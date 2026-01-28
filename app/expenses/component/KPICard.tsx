@@ -27,7 +27,7 @@ export function KPICard({
             )}
           </div>
           <div className="p-3 bg-yellow-50 rounded-lg">
-            <div className="text-yellow-600">{icon}</div>
+            <div className="text-green-500">{icon}</div>
           </div>
         </div>
       </CardContent>

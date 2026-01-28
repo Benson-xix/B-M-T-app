@@ -53,7 +53,7 @@ export function TopProducts({ transactions }: TopProductsProps) {
               {/* Rank Badge */}
               <div className={`
                 flex-shrink-0 h-8 w-8 flex items-center justify-center rounded-md font-bold text-sm
-                ${index === 0 ? 'bg-yellow-100 text-yellow-800 border border-yellow-200' : 
+                ${index === 0 ? 'bg-yellow-100 text-green-800 border border-green-200' : 
                   index === 1 ? 'bg-gray-100 text-gray-800 border border-gray-200' : 
                   index === 2 ? 'bg-amber-100 text-amber-800 border border-amber-200' : 
                   'bg-gray-50 text-gray-600 border border-gray-100'

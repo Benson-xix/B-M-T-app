@@ -175,7 +175,15 @@ const totalCreditValue = creditTransactions.reduce(
   0
 );
 
+const totalCreditBalance = creditTransactions.reduce(
+  (sum, t) => sum + (t.credit?.creditBalance || 0),
+  0
+);
 
+const totalCreditPaid = creditTransactions.reduce(
+  (sum, t) => sum + (t.credit?.amountPaidTowardCredit || 0),
+  0
+);
 
 
 const totalInstallmentValue = installmentTransactions.reduce(
@@ -192,6 +200,7 @@ const totalInstallmentRemaining = installmentTransactions.reduce(
   (sum, t) => sum + (t.installmentPlan?.remainingBalance || 0),
   0
 );
+
 
 
 const handlePrintReceipt = (transaction: Transaction) => {
@@ -328,7 +337,7 @@ const handlePrintReceipt = (transaction: Transaction) => {
           <div>
               <div className="relative">
         <Link href="/dashboard" className="flex items-center gap-3">
-          <div className="h-8 w-8 bg-yellow-300 rounded-lg flex items-center justify-center">
+          <div className="h-8 w-8 bg-green-400 rounded-lg flex items-center justify-center">
             <span className="text-black font-bold text-sm">BMT</span>
           </div>
           <div>
@@ -394,7 +403,7 @@ const handlePrintReceipt = (transaction: Transaction) => {
                   <div className="text-sm text-gray-500">Items Sold</div>
                   <div className="text-xl font-bold">{totalItems}</div>
                 </div>
-                <div className="bg-yellow-500 p-2 rounded-lg">
+                <div className="bg-green-400 p-2 rounded-lg">
                   <CreditCard className="h-5 w-5 text-white" />
                 </div>
               </div>
@@ -465,7 +474,7 @@ const handlePrintReceipt = (transaction: Transaction) => {
         </div>
       </div>
     </CardContent>
-  </Card>
+            </Card>
   
   <Card className='text-gray-900 bg-white rounded-sm border border-gray-100 shadow-2xl'>
     <CardContent className="p-4">
@@ -482,16 +491,17 @@ const handlePrintReceipt = (transaction: Transaction) => {
   </Card>
 
 
-<Card className="text-gray-900 bg-white border shadow-2xl">
+<Card className='text-gray-900 bg-white rounded-sm border border-gray-100 shadow-2xl'>
   <CardContent className="p-4">
     <div className="flex items-center justify-between">
       <div>
-        <div className="text-sm text-gray-500">Credit (Waived)</div>
-        <div className="text-xl font-bold">
-          {creditTransactions.length}
+        <div className="text-sm text-gray-500">Credit Sales (Waived)</div>
+        <div className="text-xl font-bold">{creditTransactions.length}</div>
+        <div className="text-xs text-gray-500 mt-1">
+          Total: NGN {totalCreditValue.toFixed(2)}
         </div>
         <div className="text-xs text-gray-500">
-          Value: NGN {totalCreditValue.toFixed(2)}
+          Outstanding: NGN {totalCreditBalance.toFixed(2)}
         </div>
       </div>
       <div className="bg-blue-600 p-2 rounded-lg">
@@ -500,7 +510,6 @@ const handlePrintReceipt = (transaction: Transaction) => {
     </div>
   </CardContent>
 </Card>
-
 
 <Card className="text-gray-900 bg-white border shadow-2xl">
   <CardContent className="p-4">
@@ -643,7 +652,7 @@ const handlePrintReceipt = (transaction: Transaction) => {
                         </TableCell>
                                             <TableCell>
                         {transaction.paymentMethod === 'installment' && transaction.installmentPlan && (
-                          <Badge className="bg-yellow-500 text-black">
+                          <Badge className="bg-green-400 text-black">
                             Remaining: NGN {transaction.installmentPlan.remainingBalance.toFixed(2)}
                           </Badge>
                         )}

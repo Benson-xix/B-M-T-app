@@ -262,11 +262,11 @@ const viewReport = (report: GeneratedReport): void => {
     return transactionDate >= startDate && transactionDate <= endDate;
   });
   
-  // Create report window
+ 
   const reportWindow = window.open('', '_blank', 'width=1400,height=800');
   if (!reportWindow) return;
   
-  // Calculate all report statistics
+
   const todaysTransactions = filteredTransactions;
   const totalSales = todaysTransactions.reduce((sum, t) => sum + t.total, 0);
   const totalTax = todaysTransactions.reduce((sum, t) => sum + t.tax, 0);
@@ -295,6 +295,10 @@ const viewReport = (report: GeneratedReport): void => {
   
   const creditTransactions = todaysTransactions.filter(t => t.paymentMethod === 'credit');
   const totalCreditValue = creditTransactions.reduce((sum, t) => sum + t.total, 0);
+  const totalCreditBalance = creditTransactions.reduce(
+  (sum, t) => sum + (t.credit?.creditBalance || 0),
+  0
+);
   const totalInstallmentValue = installmentTransactions.reduce((sum, t) => sum + t.total, 0);
   const totalDownPayments = installmentTransactions.reduce((sum, t) => sum + (t.installmentPlan?.downPayment || 0), 0);
   const totalInstallmentRemaining = installmentTransactions.reduce((sum, t) => sum + (t.installmentPlan?.remainingBalance || 0), 0);
@@ -311,6 +315,8 @@ const viewReport = (report: GeneratedReport): void => {
     transfer: totalTx > 0 ? ((paymentMethodCounts['transfer'] || 0) / totalTx) * 100 : 0,
     split: totalTx > 0 ? ((paymentMethodCounts['split'] || 0) / totalTx) * 100 : 0,
   };
+  
+
   
  
   reportWindow.document.write(`
@@ -375,7 +381,7 @@ const viewReport = (report: GeneratedReport): void => {
           <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
             <div>
               <div class="flex items-center gap-3 mb-2">
-                <div class="h-10 w-10 bg-yellow-300 rounded-lg flex items-center justify-center">
+                <div class="h-10 w-10 bg-green-400 rounded-lg flex items-center justify-center">
                   <span class="text-black font-bold text-sm">BMT</span>
                 </div>
                 <div>
@@ -438,7 +444,7 @@ const viewReport = (report: GeneratedReport): void => {
                   <div class="text-xl font-bold text-gray-900">${totalItems}</div>
                 </div>
                 <div class="bg-yellow-100 p-2 rounded-lg">
-                  <i class="fas fa-shopping-cart text-yellow-600 text-lg"></i>
+                  <i class="fas fa-shopping-cart text-green-500 text-lg"></i>
                 </div>
               </div>
             </div>
@@ -510,12 +516,15 @@ const viewReport = (report: GeneratedReport): void => {
             <div class="card-hover bg-white rounded-lg border border-gray-200 p-4 shadow-sm">
               <div class="flex items-center justify-between">
                 <div>
-                  <div class="text-sm text-gray-500">Credit (Waived)</div>
-                  <div class="text-xl font-bold">${creditTransactions.length}</div>
-                  <div class="text-xs text-gray-500 mt-1">Value: NGN ${totalCreditValue.toFixed(2)}</div>
+                  <div class="text-sm text-gray-500">Credit Sales (Waived)</div>
+                  <div class="text-xl font-bold text-gray-900">${creditTransactions.length}</div>
+                  <div class="text-xs text-gray-500 mt-2">
+                    <div>Total Value: NGN ${totalCreditValue.toFixed(2)}</div>
+                    <div>Outstanding Balance: NGN ${totalCreditBalance.toFixed(2)}</div>
+                  </div>
                 </div>
                 <div class="bg-blue-100 p-2 rounded-lg">
-                  <i class="fas fa-hand-holding-usd text-blue-600 text-lg"></i>
+                  <i class="fas fa-credit-card text-blue-600 text-lg"></i>
                 </div>
               </div>
             </div>
@@ -899,7 +908,7 @@ const viewReport = (report: GeneratedReport): void => {
             </div>
             
             <Button 
-              className="w-full bg-yellow-500 hover:bg-yellow-600 text-black"
+              className="w-full bg-green-400 hover:bg-green-500 text-black"
               onClick={generateReport}
             >
               <FileText className="h-4 w-4 mr-2" />

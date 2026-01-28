@@ -61,7 +61,7 @@ export default function ResetPasswordForm() {
                     <Input 
                       type="password" 
                       placeholder="Enter new password" 
-                      className="bg-gray-900/50 border-gray-700 text-white pl-10 h-11 rounded-lg focus:border-yellow-300 focus:ring-yellow-300/20"
+                      className="bg-gray-900/50 border-gray-700 text-white pl-10 h-11 rounded-lg focus:border-green-400 focus:ring-green-400/20"
                       {...field} 
                     />
                   </div>
@@ -85,7 +85,7 @@ export default function ResetPasswordForm() {
                     <Input 
                       type="password" 
                       placeholder="Confirm new password" 
-                      className="bg-gray-900/50 border-gray-700 text-white pl-10 h-11 rounded-lg focus:border-yellow-300 focus:ring-yellow-300/20"
+                      className="bg-gray-900/50 border-gray-700 text-white pl-10 h-11 rounded-lg focus:border-green-400 focus:ring-green-400/20"
                       {...field} 
                     />
                   </div>
@@ -96,18 +96,18 @@ export default function ResetPasswordForm() {
           />
           
           <div className="bg-gray-900/30 border border-gray-800 rounded-lg p-4">
-            <h4 className="text-yellow-300 text-sm font-medium mb-2">Password Requirements:</h4>
+            <h4 className="text-green-400 text-sm font-medium mb-2">Password Requirements:</h4>
             <ul className="text-gray-400 text-xs space-y-1">
               <li className="flex items-center gap-2">
-                <div className="w-1.5 h-1.5 bg-yellow-300/50 rounded-full"></div>
+                <div className="w-1.5 h-1.5 bg-green-400/50 rounded-full"></div>
                 Minimum 8 characters
               </li>
               <li className="flex items-center gap-2">
-                <div className="w-1.5 h-1.5 bg-yellow-300/50 rounded-full"></div>
+                <div className="w-1.5 h-1.5 bg-green-400/50 rounded-full"></div>
                 Use uppercase & lowercase letters
               </li>
               <li className="flex items-center gap-2">
-                <div className="w-1.5 h-1.5 bg-yellow-300/50 rounded-full"></div>
+                <div className="w-1.5 h-1.5 bg-green-400/50 rounded-full"></div>
                 Include numbers and special characters
               </li>
             </ul>
@@ -115,7 +115,7 @@ export default function ResetPasswordForm() {
           
           <Button 
             type="submit" 
-            className="w-full bg-yellow-300 hover:bg-yellow-400 text-black font-bold h-11 rounded-lg transition-all duration-300 transform hover:scale-[1.02] active:scale-95 shadow-lg hover:shadow-xl shadow-yellow-300/20"
+            className="w-full bg-green-400 hover:bg-green-400 text-black font-bold h-11 rounded-lg transition-all duration-300 transform hover:scale-[1.02] active:scale-95 shadow-lg hover:shadow-xl shadow-green-400/20"
             disabled={loading}
           >
             {loading ? (

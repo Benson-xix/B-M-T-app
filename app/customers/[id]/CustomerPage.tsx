@@ -304,7 +304,7 @@ export function CustomerDetailPage({ customerId }: PageProps) {
       case 'transfer': return 'bg-indigo-100 text-indigo-800 hover:bg-indigo-200';
       case 'split': return 'bg-pink-100 text-pink-800 hover:bg-pink-200';
       case 'credit': return 'bg-blue-100 text-blue-800 hover:bg-blue-200';
-      case 'installment': return 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200';
+      case 'installment': return 'bg-yellow-100 text-green-800 hover:bg-green-200';
       default: return 'bg-gray-100 text-gray-800 hover:bg-gray-200';
     }
   };
@@ -489,7 +489,7 @@ export function CustomerDetailPage({ customerId }: PageProps) {
         <div className="flex flex-col xl:flex-row justify-between items-center mb-4 gap-4">
           <h3 className="font-semibold text-lg">
             Transactions ({filteredTxns.length})
-            {filterOwing && <span className="text-yellow-400 ml-2">(Owing Only)</span>}
+            {filterOwing && <span className="text-green-400 ml-2">(Owing Only)</span>}
             {paymentMethodFilter !== 'all' && (
               <span className="text-blue-400 ml-2">({paymentMethodFilter})</span>
             )}
@@ -524,7 +524,7 @@ export function CustomerDetailPage({ customerId }: PageProps) {
               }} 
               className={`px-4 py-2 rounded font-medium ${
                 filterOwing 
-                  ? 'bg-yellow-500 text-black hover:bg-yellow-600' 
+                  ? 'bg-green-400 text-black hover:bg-green-500' 
                   : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
               }`}
             >
@@ -581,7 +581,7 @@ export function CustomerDetailPage({ customerId }: PageProps) {
                         <td className="p-3 capitalize">
                           <span className={`px-2 py-1 rounded text-xs ${
                             txn.paymentMethod === 'credit' ? 'bg-blue-900/30 text-blue-300' :
-                            txn.paymentMethod === 'installment' ? 'bg-yellow-900/30 text-yellow-300' :
+                            txn.paymentMethod === 'installment' ? 'bg-green-900/30 text-green-400' :
                             txn.paymentMethod === 'cash' ? 'bg-green-900/30 text-green-300' :
                             txn.paymentMethod === 'card' ? 'bg-purple-900/30 text-purple-300' :
                             txn.paymentMethod === 'transfer' ? 'bg-indigo-900/30 text-indigo-300' :
@@ -598,7 +598,7 @@ export function CustomerDetailPage({ customerId }: PageProps) {
                         </td>
                         <td className="p-3">
                           <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                            isCompleted ? 'bg-green-900/30 text-green-400' : 'bg-yellow-900/30 text-yellow-400'
+                            isCompleted ? 'bg-green-900/30 text-green-400' : 'bg-green-900/30 text-green-400'
                           }`}>
                             {isCompleted ? 'Completed' : 'Pending'}
                           </span>
@@ -674,7 +674,7 @@ export function CustomerDetailPage({ customerId }: PageProps) {
                           onClick={() => setCurrentPage(pageNum)}
                           className={`w-8 h-8 rounded ${
                             currentPage === pageNum
-                              ? 'bg-yellow-500 text-black'
+                              ? 'bg-green-400 text-black'
                               : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
                           }`}
                         >

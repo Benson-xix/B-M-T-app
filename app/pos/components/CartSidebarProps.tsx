@@ -360,7 +360,7 @@ export function CartSidebar({
         </div>
         
         <Button
-          className="w-full bg-yellow-500 hover:bg-yellow-600 text-black flex items-center gap-2"
+          className="w-full bg-green-400 hover:bg-green-500 text-black flex items-center gap-2"
           size="lg"
           onClick={onCheckout}
           disabled={cart.length === 0}

@@ -44,7 +44,7 @@ export function InventoryOverview({ searchQuery }: { searchQuery: string }) {
   const kpis = [
     { title: "Total Stock", value: "1,248", icon: Package, color: "bg-blue-500" },
      { title: "In Stock", value: "20", icon: Package, color: "bg-blue-500" },
-    { title: "Low Stock", value: "42", icon: AlertTriangle, color: "bg-yellow-500" },
+    { title: "Low Stock", value: "42", icon: AlertTriangle, color: "bg-green-400" },
     { title: "Out of Stock", value: "18", icon: AlertTriangle, color: "bg-red-500" },
     { title: "Inventory Sell Value", value: "NGN 248,950", icon: DollarSign, color: "bg-green-500" },
     { title: "Inventory Cost", value: "NGN 248,950", icon: TrendingUp, color: "bg-indigo-500" },
@@ -64,7 +64,7 @@ export function InventoryOverview({ searchQuery }: { searchQuery: string }) {
     count: 42,
     percentage: 3.4,
     stroke: "#f59e0b",
-    dot: "bg-yellow-500",
+    dot: "bg-green-400",
     description: "Below minimum threshold",
   },
   {

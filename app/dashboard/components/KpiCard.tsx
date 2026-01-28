@@ -9,7 +9,7 @@ interface KpiCardProps {
 
 export function KpiCard({ title, value,icon, description }: KpiCardProps) {
   return (
-    <Card className="bg-white  shadow-2xl backdrop-blur-sm border-gray-100 hover:border-yellow-300/30 transition-all duration-300">
+    <Card className="bg-white  shadow-2xl backdrop-blur-sm border-gray-100 hover:border-green-400/30 transition-all duration-300">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-sm font-medium text-gray-950">
           {title}

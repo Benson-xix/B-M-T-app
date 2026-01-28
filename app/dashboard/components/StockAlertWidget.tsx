@@ -52,7 +52,7 @@ export function StockAlertWidget() {
               Low stock items requiring attention
             </CardDescription>
           </div>
-          <div className="text-yellow-500">
+          <div className="text-green-400">
             <AlertTriangle className="h-5 w-5" />
           </div>
         </div>
@@ -66,7 +66,7 @@ export function StockAlertWidget() {
                 flex items-start gap-3 p-3 rounded-lg border
                 ${item.status === 'critical' 
                   ? 'bg-red-50 border-red-200' 
-                  : 'bg-yellow-50 border-yellow-200'
+                  : 'bg-yellow-50 border-green-200'
                 }
                 hover:shadow-sm transition-shadow duration-200
               `}
@@ -108,7 +108,7 @@ export function StockAlertWidget() {
                         <span className="text-gray-600">Current:</span>
                         <span className={`
                           font-medium
-                          ${item.status === 'critical' ? 'text-red-600' : 'text-yellow-600'}
+                          ${item.status === 'critical' ? 'text-red-600' : 'text-green-500'}
                         `}>
                           {item.current} units
                         </span>
@@ -125,7 +125,7 @@ export function StockAlertWidget() {
                     self-start md:self-center px-3 py-1 rounded-full text-xs font-medium
                     ${item.status === 'critical' 
                       ? 'bg-red-100 text-red-800 border border-red-200' 
-                      : 'bg-yellow-100 text-yellow-800 border border-yellow-200'
+                      : 'bg-yellow-100 text-green-800 border border-green-200'
                     }
                   `}>
                     {item.status === 'critical' ? 'URGENT' : 'WARNING'}
@@ -142,7 +142,7 @@ export function StockAlertWidget() {
                     <div 
                       className={`
                         h-full rounded-full
-                        ${item.status === 'critical' ? 'bg-red-500' : 'bg-yellow-500'}
+                        ${item.status === 'critical' ? 'bg-red-500' : 'bg-green-400'}
                       `}
                       style={{ width: `${Math.min((item.current / item.min) * 100, 100)}%` }}
                     />

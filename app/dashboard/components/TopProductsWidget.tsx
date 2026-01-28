@@ -36,7 +36,7 @@ export function TopProductsWidget() {
               <div
                 className={cn(
                   "shrink-0 h-8 w-8 flex items-center justify-center rounded-md font-bold text-sm",
-                  index === 0 ? "bg-yellow-100 text-yellow-800 border border-yellow-200" :
+                  index === 0 ? "bg-yellow-100 text-green-800 border border-green-200" :
                   index === 1 ? "bg-gray-100 text-gray-800 border border-gray-200" :
                   index === 2 ? "bg-amber-100 text-amber-800 border border-amber-200" :
                   "bg-gray-50 text-gray-600 border border-gray-100"
@@ -103,7 +103,7 @@ export function TopProductsWidget() {
         
         <div className="mt-6 pt-4 border-t border-gray-200 flex flex-col md:flex-row items-center justify-between gap-2">
           <div className="text-sm text-gray-600">
-            <span className="text-yellow-600 font-medium">Note:</span> 
+            <span className="text-green-500 font-medium">Note:</span> 
             <span className="ml-1">Data based on selected date range</span>
           </div>
           <div className="flex items-center gap-1">

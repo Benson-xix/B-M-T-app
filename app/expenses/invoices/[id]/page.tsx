@@ -68,7 +68,7 @@ export default function InvoicePage() {
       case 'approved':
         return <Badge className="bg-green-100 text-green-800"><CheckCircle className="w-3 h-3 mr-1" /> Approved</Badge>;
       case 'pending':
-        return <Badge className="bg-yellow-100 text-yellow-800"><AlertCircle className="w-3 h-3 mr-1" /> Pending</Badge>;
+        return <Badge className="bg-yellow-100 text-green-800"><AlertCircle className="w-3 h-3 mr-1" /> Pending</Badge>;
       case 'rejected':
         return <Badge className="bg-red-100 text-red-800"><XCircle className="w-3 h-3 mr-1" /> Rejected</Badge>;
     }
@@ -141,7 +141,7 @@ export default function InvoicePage() {
                 </div>
                 
                 <div className="mt-4 md:mt-0 text-right">
-                  <div className="text-3xl font-bold text-yellow-600">NGN {expense.amount.toLocaleString()}</div>
+                  <div className="text-3xl font-bold text-green-500">NGN {expense.amount.toLocaleString()}</div>
                   <div className="mt-2">{getStatusBadge(expense.status)}</div>
                 </div>
               </div>
@@ -265,7 +265,7 @@ export default function InvoicePage() {
                   
                   <div className="text-center">
                     <div className="flex items-center gap-3">
-                    <div className="h-8 w-8 bg-yellow-300 rounded-lg flex items-center justify-center">
+                    <div className="h-8 w-8 bg-green-400 rounded-lg flex items-center justify-center">
                         <span className="text-black font-bold text-sm">BMT</span>
                     </div>
                     <div>

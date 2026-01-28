@@ -47,7 +47,7 @@ export default function RegisterPage() {
           Already have an account?{' '}
           <Link 
             href="/auth/login" 
-            className="text-yellow-300 hover:text-yellow-400 hover:underline transition-colors font-medium"
+            className="text-green-400 hover:text-green-400 hover:underline transition-colors font-medium"
           >
             Sign In
           </Link>
@@ -69,7 +69,7 @@ export default function RegisterPage() {
                     </svg>
                     <Input 
                       placeholder="John Smith" 
-                      className="bg-gray-900/50 border-gray-700 text-white pl-10 h-11 rounded-lg focus:border-yellow-300 focus:ring-yellow-300/20"
+                      className="bg-gray-900/50 border-gray-700 text-white pl-10 h-11 rounded-lg focus:border-green-400 focus:ring-green-400/20"
                       {...field} 
                     />
                   </div>
@@ -93,7 +93,7 @@ export default function RegisterPage() {
                     <Input 
                       type="email" 
                       placeholder="john.smith@bigmentransaction.com" 
-                      className="bg-gray-900/50 border-gray-700 text-white pl-10 h-11 rounded-lg focus:border-yellow-300 focus:ring-yellow-300/20"
+                      className="bg-gray-900/50 border-gray-700 text-white pl-10 h-11 rounded-lg focus:border-green-400 focus:ring-green-400/20"
                       {...field} 
                     />
                   </div>
@@ -117,7 +117,7 @@ export default function RegisterPage() {
                     <Input 
                       type="password" 
                       placeholder="Minimum 8 characters" 
-                      className="bg-gray-900/50 border-gray-700 text-white pl-10 h-11 rounded-lg focus:border-yellow-300 focus:ring-yellow-300/20"
+                      className="bg-gray-900/50 border-gray-700 text-white pl-10 h-11 rounded-lg focus:border-green-400 focus:ring-green-400/20"
                       {...field} 
                     />
                   </div>
@@ -132,7 +132,7 @@ export default function RegisterPage() {
           
           <Button 
             type="submit" 
-            className="w-full bg-yellow-300 hover:bg-yellow-400 text-black font-bold h-11 rounded-lg transition-all duration-300 transform hover:scale-[1.02] active:scale-95 shadow-lg hover:shadow-xl shadow-yellow-300/20"
+            className="w-full bg-green-400 hover:bg-green-400 text-black font-bold h-11 rounded-lg transition-all duration-300 transform hover:scale-[1.02] active:scale-95 shadow-lg hover:shadow-xl shadow-green-400/20"
             disabled={loading}
           >
             {loading ? (
