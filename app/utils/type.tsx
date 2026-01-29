@@ -32,6 +32,7 @@ export interface Product {
   inventoryCost: number;
   totalStock: number;
   totalRevenue: number;
+    discount?: Discount;
 }
 
 export interface ProductFormData {
@@ -71,6 +72,7 @@ export interface CartItem {
   taxable: boolean;
   image: string;
   stock: number;
+  productDiscount?: Discount;
 }
 
 export interface Customer {
@@ -122,9 +124,10 @@ export interface Transaction {
   customer: Customer;
   items: CartItem[];
   subtotal: number;
+  taxRate: number;  
   tax: number;
   total: number;
-  discount?: number;
+  totalDiscount: number;
   paymentMethod: 'cash' | 'card' | 'transfer' | 'split' | 'installment' | 'credit';
   amountPaid: number;
   change: number;
@@ -263,4 +266,18 @@ export const loginAttempts = [
               approvedBy: 'Admin',
               status: 'approved' as const,
             },
-          ]
+          ];
+
+export type DiscountType = "percentage" | "fixed";
+export  type DiscountStatus = "active" | "expired";
+
+export type Discount = {
+  id: string;
+  name: string;
+  type: DiscountType;
+  value: number;
+  startDate?: string;
+  endDate?: string;
+  status: DiscountStatus;
+};
+

@@ -274,7 +274,7 @@ const viewReport = (report: GeneratedReport): void => {
     (sum, t) => sum + t.items.reduce((itemSum, item) => itemSum + item.quantity, 0),
     0
   );
-  const totalDiscounts = todaysTransactions.reduce((sum, t) => sum + (t.discount || 0), 0);
+  const totalDiscounts = todaysTransactions.reduce((sum, t) => sum + (t.totalDiscount || 0), 0);
   
   const purchaseTypeCounts = todaysTransactions.reduce((acc, t) => {
     const type = t.purchaseType || 'in-store';
@@ -704,14 +704,14 @@ const viewReport = (report: GeneratedReport): void => {
         subtotal: t.subtotal,
         tax: t.tax,
         total: t.total,
-        discount: t.discount,
         paymentMethod: t.paymentMethod,
         purchaseType: t.purchaseType,
+        totalDiscount: t.totalDiscount || 0,
       })),
       summary: {
         totalTransactions: filteredTransactions.length,
         totalRevenue: filteredTransactions.reduce((sum, t) => sum + t.total, 0),
-        totalDiscount: filteredTransactions.reduce((sum, t) => sum + (t.discount || 0), 0),
+         totalDiscount: filteredTransactions.reduce((sum, t) => sum + (t.totalDiscount || 0), 0), 
         averageTransaction: filteredTransactions.length > 0 
           ? filteredTransactions.reduce((sum, t) => sum + t.total, 0) / filteredTransactions.length
           : 0,

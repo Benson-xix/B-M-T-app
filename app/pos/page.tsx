@@ -12,6 +12,8 @@ import { ProductFilters } from './components/ProductFiltersProps';
 import { POSHeader } from './components/POSHeader';
 import { NetworkStatus } from './components/NetworkStatus';
 import { CheckoutModal } from './components/CheckoutModalProps';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
 
 
 
@@ -21,7 +23,7 @@ export default function POSPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [selectedProduct, setSelectedProduct] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
-
+    const [itemDiscountToggles, setItemDiscountToggles] = useState<Record<string, boolean>>({});
     const [purchaseType, setPurchaseType] = useState<'in-store' | 'online'>('in-store');
 
 
@@ -30,15 +32,41 @@ export default function POSPage() {
   const [showLoadDraft, setShowLoadDraft] = useState<boolean>(false);
   const [showCheckout, setShowCheckout] = useState<boolean>(false);
  const [cart, setCart] = useState<CartItem[]>([]);
+  const [taxRate, setTaxRate] = useState<number>(0);
+  const [isHydrated, setIsHydrated] = useState<boolean>(false);
+
+
 
 const [selectedCustomer, setSelectedCustomer] = useState<Customer>({
   id: "walk-in",
   name: "Walk-in Customer",
 });
 
+  useEffect(() => {
+    const savedTaxRate = localStorage.getItem('pos_default_tax_rate');
+    if (savedTaxRate) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setTaxRate(parseFloat(savedTaxRate));
+    }
+    setIsHydrated(true);
+  }, []);
+
   const generateDraftId = () => crypto.randomUUID();
 const getTimestamp = () => new Date().toISOString();
 
+  const handleTaxRateChange = (newRate: number) => {
+    setTaxRate(newRate);
+    localStorage.setItem('pos_default_tax_rate', newRate.toString());
+  };
+
+const handleResetCart = () => {
+    setCart([]);
+    setItemDiscountToggles({});
+    setSelectedCustomer({
+      id: "walk-in",
+      name: "Walk-in Customer",
+    });
+  };
  
   const mockProducts: Product[] = [
     {
@@ -52,6 +80,13 @@ const getTimestamp = () => new Date().toISOString();
       unit: "Pieces",
       hasVariations: true,
       images: ["https://images.unsplash.com/photo-1551028719-00167b16eac5"],
+       discount: {
+        id: 'dis1',
+      name: "Winter Sale",
+      type: "percentage",
+      value: 10,
+      status: 'expired'
+    },
       variants: [
         {
           id: "1-1",
@@ -62,7 +97,8 @@ const getTimestamp = () => new Date().toISOString();
           sellingPrice: 299.99,
           quantity: 42,
           threshold: 10,
-          images: ["https://images.unsplash.com/photo-1551028719-00167b16eac5"]
+          images: ["https://images.unsplash.com/photo-1551028719-00167b16eac5"],
+          
         },
         {
           id: "1-2",
@@ -92,6 +128,13 @@ const getTimestamp = () => new Date().toISOString();
       unit: "Pieces",
       hasVariations: true,
       images: ["https://images.unsplash.com/photo-1542272604-787c3835535d"],
+       discount: {
+      id: 'dis2',
+      name: "Winter Sale",
+      type: "fixed",
+      value: 30,
+      status: 'active'
+    },
       variants: [
         {
           id: "2-1",
@@ -121,6 +164,7 @@ const getTimestamp = () => new Date().toISOString();
       totalStock: 25,
       totalRevenue: 4499.50,
     },
+    
   ];
 
  
@@ -168,6 +212,7 @@ const getTimestamp = () => new Date().toISOString();
           taxable: product.taxable,
           image: variant.images[0] || product.images[0],
           stock: variant.quantity,
+          productDiscount: product.discount,
         }
       ]);
     }
@@ -213,9 +258,9 @@ const handleSaveDraft = () => {
     return cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   };
 
-  const calculateTax = () => {
+    const calculateTax = () => {
     const taxableItems = cart.filter(item => item.taxable);
-    return taxableItems.reduce((sum, item) => sum + (item.price * item.quantity * 0.1), 0); // 10% tax
+    return taxableItems.reduce((sum, item) => sum + (item.price * item.quantity * (taxRate / 100)), 0);
   };
 
   const calculateTotal = () => {
@@ -243,6 +288,40 @@ const handleSaveDraft = () => {
     return matchesBrand && matchesCategory && matchesProduct && matchesSearch;
   });
 
+  const handleToggleDiscount = (itemId: string) => {
+  setItemDiscountToggles(prev => ({
+    ...prev,
+    [itemId]: !prev[itemId],
+  }));
+};
+
+
+const calculateDiscount = () => {
+  return cart.reduce((sum, item) => {
+    const discount = item.productDiscount;
+    if (!discount || !itemDiscountToggles[item.id] || discount.status === 'expired') return sum;
+
+    if (discount.type === 'percentage') {
+      return sum + (item.price * item.quantity * discount.value) / 100;
+    } else {
+      return sum + Math.min(discount.value, item.price * item.quantity);
+    }
+  }, 0);
+};
+
+
+  const totalDiscount = calculateDiscount();
+  const finalTotal = Math.max(0, calculateTotal() - totalDiscount);
+
+   if (!isHydrated) {
+    return (
+      <div className="min-h-screen bg-gray-50 text-gray-900 flex items-center justify-center">
+        <div className="text-gray-600">Loading...</div>
+      </div>
+    );
+  }
+
+
   return (
       <div className="min-h-screen bg-gray-50 text-gray-900">
       
@@ -254,7 +333,21 @@ const handleSaveDraft = () => {
                 <Clock className="h-4 w-4" />
                 Session: {formatTime(sessionTime)}
               </div>
+           <div className="flex items-center gap-2 ml-auto">
+              <Label htmlFor="taxRate" className="text-sm">Set Sale Tax Rate:</Label>
+              <Input
+                id="taxRate"
+                type="number"
+                min="0"
+                max="100"
+                step="0.1"
+                value={taxRate}
+                onChange={(e) => handleTaxRateChange(parseFloat(e.target.value) || 0)}
+                className="w-16 h-8 text-center border border-gray-900"
+              />
+              <span className="text-sm">%</span>
             </div>
+          </div>
             
             <Button 
               variant="secondary" 
@@ -307,11 +400,14 @@ const handleSaveDraft = () => {
               onLoadDraft={() => setShowLoadDraft(true)}
               onCheckout={() => setShowCheckout(true)}
               subtotal={calculateSubtotal()}
+              taxRate={taxRate}
               tax={calculateTax()}
-              total={calculateTotal()}
+           total={calculateTotal()} 
               onCreateCustomer={() => setShowCreateCustomer(true)}
                purchaseType={purchaseType}                 
                  onPurchaseTypeChange={setPurchaseType} 
+                     itemDiscountToggles={itemDiscountToggles}
+                      onDiscountToggle={handleToggleDiscount} 
             />
           </div>
         </div>
@@ -343,10 +439,13 @@ const handleSaveDraft = () => {
           customer={selectedCustomer}
           subtotal={calculateSubtotal()}
           tax={calculateTax()}
+          taxRate={taxRate} 
           total={calculateTotal()}
+        totalDiscount={totalDiscount} 
+        itemDiscountToggles={itemDiscountToggles} 
            purchaseType={purchaseType}
           onComplete={() => {
-            setCart([]);
+           handleResetCart(); 
             setShowCheckout(false);
           }}
           

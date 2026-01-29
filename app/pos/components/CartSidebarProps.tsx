@@ -11,12 +11,14 @@ import { Badge } from "@/components/ui/badge";
 import { Trash2, Plus, Minus, UserPlus, FileText, CreditCard, ShoppingCart } from "lucide-react";
 import Image from 'next/image';
 import { CartItem, Customer } from '@/app/utils/type';
+import { Switch } from '@/components/ui/switch';
 
 interface CartSidebarProps {
   cart: CartItem[];
   selectedCustomer: Customer;
   subtotal: number;
   tax: number;
+  taxRate: number;  
   total: number;
   onCustomerChange: (customer: Customer) => void;
   onUpdateQuantity: (itemId: string, quantity: number) => void;
@@ -27,6 +29,8 @@ interface CartSidebarProps {
   onCreateCustomer: () => void;
   purchaseType: 'in-store' | 'online';                   
   onPurchaseTypeChange: (type: 'in-store' | 'online') => void;
+   itemDiscountToggles?: Record<string, boolean>;
+  onDiscountToggle?: (itemId: string) => void;
 }
 
 export function CartSidebar({
@@ -34,6 +38,7 @@ export function CartSidebar({
   selectedCustomer,
   subtotal,
   tax,
+  taxRate, 
   total,
   onCustomerChange,
   onUpdateQuantity,
@@ -43,11 +48,11 @@ export function CartSidebar({
   onCheckout,
   onCreateCustomer,
   purchaseType,
-  onPurchaseTypeChange
+  onPurchaseTypeChange,
+  itemDiscountToggles = {},
+  onDiscountToggle,
 }: CartSidebarProps) {
-  const [discount, setDiscount] = useState<number>(0);
-  const [discountType, setDiscountType] = useState<'percentage' | 'fixed'>('percentage');
-  const [discountValue, setDiscountValue] = useState<string>('');
+
 
  
   const customers = [
@@ -57,27 +62,42 @@ export function CartSidebar({
     { id: 'cust-3', name: 'Robert Johnson', email: 'robert@example.com', phone: '+1122334455' },
   ];
 
-  const handleApplyDiscount = () => {
-    if (!discountValue) return;
+
+
+const handleToggleDiscount = (itemId: string) => {
+  if (onDiscountToggle) {
+    onDiscountToggle(itemId);
+  }
+};
+
+const getItemDiscount = (item: CartItem) => {
+  const discount = item.productDiscount;
+  if (!discount) return 0;
+ 
+  if (!itemDiscountToggles[item.id] || discount.status === 'expired') return 0;
+
+  if (discount.type === 'percentage') {
+    return (item.price * item.quantity * discount.value) / 100;
+  } else {
+    return Math.min(discount.value, item.price * item.quantity);
+  }
+};
+
+
+const totalDiscount = cart.reduce((sum, item) => sum + getItemDiscount(item), 0);
+const finalTotal = Math.max(0, total - totalDiscount);
+
+  const handleCheckout = () => {
+    const discountData = {
+      itemDiscountToggles,
+      totalDiscount,
+      discountedTotal: finalTotal,
+    };
     
-    const value = parseFloat(discountValue);
-    if (isNaN(value)) return;
-    
-    if (discountType === 'percentage') {
-      setDiscount((subtotal * value) / 100);
-    } else {
-      setDiscount(Math.min(value, subtotal));
-    }
-    
-    setDiscountValue('');
+    sessionStorage.setItem('currentDiscount', JSON.stringify(discountData));
+    onCheckout();
   };
 
-  const handleClearDiscount = () => {
-    setDiscount(0);
-    setDiscountValue('');
-  };
-
-  const finalTotal = Math.max(0, total - discount);
 
   return (
     <div className="h-full flex flex-col">
@@ -143,14 +163,14 @@ export function CartSidebar({
             <Button
   variant={purchaseType === 'in-store' ? 'default' : 'secondary'}
   className="justify-start"
-  onClick={() => onPurchaseTypeChange('in-store')}   // ✅ use handler
+  onClick={() => onPurchaseTypeChange('in-store')}  
 >
   In-Store
 </Button>
 <Button
   variant={purchaseType === 'online' ? 'default' : 'secondary'}
   className="justify-start"
-  onClick={() => onPurchaseTypeChange('online')}     // ✅ use handler
+  onClick={() => onPurchaseTypeChange('online')}   
 >
   Online
 </Button>
@@ -217,7 +237,7 @@ export function CartSidebar({
                           </Button>
                         </div>
                         
-                        <div className="flex items-center justify-between mt-2">
+                        <div className="grid grid-cols-2 gap-2 ">
                           <div className="flex items-center gap-2">
                             <Button
                               size="sm"
@@ -243,8 +263,19 @@ export function CartSidebar({
                               <Plus className="h-3 w-3" />
                             </Button>
                           </div>
+                            {item.productDiscount && (
+                              <Badge className="flex items-center justify-between gap-2 p-2 bg-gray-800 rounded-2xl border border-green-200">
+                                <span className="text-sm text-green-700 font-medium">
+                                  {item.productDiscount.name}
+                                </span>
+                             <Switch
+                                checked={!!itemDiscountToggles[item.id]}
+                                onCheckedChange={() => handleToggleDiscount(item.id)}
+                              />
+                              </Badge>
+                            )}
                           
-                          <div className="text-right">
+                          <div className=" flex flex-col">
                             <div className="font-bold">
                               NGN {(item.price * item.quantity).toFixed(2)}
                             </div>
@@ -263,50 +294,7 @@ export function CartSidebar({
         </div>
 
       
-        <div className="space-y-3">
-          <Label>Discount</Label>
-          <div className="flex gap-2">
-            <Select value={discountType} onValueChange={(value: 'percentage' | 'fixed') =>
-    setDiscountType(value)
-  }>
-              <SelectTrigger className="w-32 border border-gray-900">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="percentage">%</SelectItem>
-                <SelectItem value="fixed">Fixed</SelectItem>
-              </SelectContent>
-            </Select>
-            
-            <Input
-              placeholder={discountType === 'percentage' ? 'Percentage' : 'Amount'}
-              value={discountValue}
-              onChange={(e) => setDiscountValue(e.target.value)}
-              className='border border-gray-900'
-            />
-            
-            <Button variant="secondary" onClick={handleApplyDiscount}>
-              Apply
-            </Button>
-          </div>
-          
-          {discount > 0 && (
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-green-600">Discount applied</span>
-              <div className="flex items-center gap-2">
-                <span className="font-bold">- NGN {discount.toFixed(2)}</span>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-6 px-2"
-                  onClick={handleClearDiscount}
-                >
-                  Clear
-                </Button>
-              </div>
-            </div>
-          )}
-        </div>
+    
       </div>
       
     
@@ -318,16 +306,16 @@ export function CartSidebar({
           </div>
           
           <div className="flex justify-between text-sm">
-            <span className="text-gray-600">Tax (10%)</span>
+            <span className="text-gray-600">Tax ({taxRate}%)</span>
             <span className="font-medium">NGN {tax.toFixed(2)}</span>
           </div>
           
-          {discount > 0 && (
-            <div className="flex justify-between text-sm">
-              <span className="text-green-600">Discount</span>
-              <span className="font-medium text-green-600">- NGN {discount.toFixed(2)}</span>
-            </div>
-          )}
+         {totalDiscount > 0 && (
+  <div className="flex justify-between text-sm">
+    <span className="text-green-600">Discount</span>
+    <span className="font-medium text-green-600">- NGN {totalDiscount.toFixed(2)}</span>
+  </div>
+)}
           
           <Separator />
           
@@ -362,7 +350,7 @@ export function CartSidebar({
         <Button
           className="w-full bg-green-400 hover:bg-green-500 text-black flex items-center gap-2"
           size="lg"
-          onClick={onCheckout}
+          onClick={handleCheckout}
           disabled={cart.length === 0}
         >
           <CreditCard className="h-5 w-5" />

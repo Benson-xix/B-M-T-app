@@ -363,13 +363,13 @@ export function TransactionsTab({
                     <TableCell>
                       {getPaymentBadge(transaction.paymentMethod)}
                     </TableCell>
-                    <TableCell>
-                      {transaction.discount ? (
-                        <span className="text-red-600">- NGN {transaction.discount.toFixed(2)}</span>
-                      ) : (
-                        <span className="text-gray-500">None</span>
-                      )}
-                    </TableCell>
+                 <TableCell>
+  {transaction.totalDiscount ? (  
+    <span className="text-red-600">- NGN {transaction.totalDiscount.toFixed(2)}</span>
+  ) : (
+    <span className="text-gray-500">None</span>
+  )}
+</TableCell>
                     <TableCell className="font-bold">
                       NGN {transaction.total.toFixed(2)}
                     </TableCell>
@@ -503,7 +503,7 @@ export function TransactionsTab({
               <CardContent className="p-4">
                 <div className="text-sm text-gray-500">Total Discount</div>
                 <div className="text-xl font-bold text-red-600">
-                  NGN {filteredTransactions.reduce((sum, t) => sum + (t.discount || 0), 0).toFixed(2)}
+                  NGN {filteredTransactions.reduce((sum, t) => sum + (t.totalDiscount || 0), 0).toFixed(2)}
                 </div>
               </CardContent>
             </Card>

@@ -7,11 +7,12 @@ import { Badge } from "@/components/ui/badge";
 import { ShoppingCart, ChevronLeft, ChevronRight } from "lucide-react";
 
 import Image from 'next/image';
-import { Product, ProductVariant } from '@/app/utils/type';
+import { Discount, Product, ProductVariant } from '@/app/utils/type';
 
 interface ProductGridProps {
   variants: Array<ProductVariant & { product: Product }>;
-  onAddToCart: (variant: ProductVariant, product: Product) => void;
+ onAddToCart: (variant: ProductVariant, product: Product, discount?: Discount) => void;
+  
 }
 
 export function ProductGrid({ variants, onAddToCart }: ProductGridProps) {
@@ -28,30 +29,26 @@ const getStockStatus = (
   quantity: number,
   threshold: number
 ): {
-  label: string;
-  color: BadgeVariant;
-  bgColor: string;
+   label: string;
+  badgeClass: string
 } => {
-  if (quantity === 0) {
+ if (quantity === 0) {
     return {
       label: "Out of Stock",
-      color: "destructive",
-      bgColor: "bg-red-100",
+      badgeClass: "bg-red-600 text-white border-red-700", 
     };
   }
 
   if (quantity <= threshold) {
     return {
       label: "Low Stock",
-      color: "default",
-      bgColor: "bg-yellow-100",
+      badgeClass: "bg-yellow-500 text-white border-yellow-600", 
     };
   }
 
   return {
     label: `${quantity} in stock`,
-    color: "default",
-    bgColor: "bg-green-100",
+    badgeClass: "bg-green-500 text-white border-green-600", 
   };
 };
 
@@ -87,7 +84,7 @@ const getStockStatus = (
                   }`}
                 >
          
-                  <div className="relative aspect-square overflow-hidden p-2 bg-gray-100">
+                  <div className="relative aspect-square overflow-hidden p-1 bg-gray-100">
                     {variant.images && variant.images.length > 0 ? (
                       <Image
                         src={variant.images[0]}
@@ -103,24 +100,21 @@ const getStockStatus = (
                     )}
                     
                    
-                    <div className="absolute top-2 left-2">
-                     <Badge
-                    variant={status.color}
-                    className={`${status.bgColor} text-xs font-medium`}
-                    >
-                    {status.label}
-                    </Badge>
+                    <div className="absolute top-2 left-2 ">
+                 <Badge className={`text-xs font-medium ${status.badgeClass}`}>
+                  {status.label}
+                </Badge>
 
                     </div>
                     
                  
-                    {variant.quantity === 0 && (
-                      <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                        <Badge variant="destructive" className="text-sm">
-                          Out of Stock
-                        </Badge>
-                      </div>
-                    )}
+                {variant.quantity === 0 && (
+                  <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                    <Badge className="text-sm bg-red-600 text-white border-red-700">
+                      Out of Stock
+                    </Badge>
+                  </div>
+                )}
                   </div>
                   
                  
@@ -157,7 +151,7 @@ const getStockStatus = (
                       </Button>
                     </div>
                     
-                    {/* SKU */}
+                  
                     <div className="text-xs text-gray-500 font-mono truncate">
                       SKU: {variant.sku}
                     </div>
@@ -167,7 +161,7 @@ const getStockStatus = (
             })}
           </div>
           
-          {/* Pagination */}
+       
           {totalPages > 1 && (
             <div className="flex items-center justify-between mt-6 pt-4 border-t border-gray-200">
               <div className="text-sm text-gray-500">

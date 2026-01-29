@@ -42,9 +42,12 @@ interface CheckoutModalProps {
   customer: Customer;
   subtotal: number;
   tax: number;
+  taxRate: number;
   total: number;
   onComplete: () => void;
   purchaseType: 'in-store' | 'online';
+    totalDiscount?: number;  
+  itemDiscountToggles?: Record<string, boolean>; 
 }
 
 export function CheckoutModal({
@@ -54,12 +57,24 @@ export function CheckoutModal({
   customer,
   subtotal,
   tax,
+  taxRate,
   total,
   onComplete,
   purchaseType,
+  totalDiscount = 0,  
+  itemDiscountToggles = {},
 }: CheckoutModalProps) {
+
+  const [customTax, setCustomTax] = useState<number>(tax);
+
+     useEffect(() => {
+    setCustomTax(tax);
+  }, [tax, open]);
+
+  const netTotal = (subtotal + customTax) - (totalDiscount || 0);
+
   const [paymentMethod, setPaymentMethod] = useState<string>('cash');
-  const [amountPaid, setAmountPaid] = useState<string>(total.toFixed(2));
+  const [amountPaid, setAmountPaid] = useState<string>(netTotal.toFixed(2));
   const [showReceipt, setShowReceipt] = useState<boolean>(false);
   const [showSplitPayment, setShowSplitPayment] = useState<boolean>(false);
   const [showInstallmentModal, setShowInstallmentModal] = useState<boolean>(false);
@@ -67,7 +82,7 @@ export function CheckoutModal({
     { method: 'cash', amount: '' },
     { method: 'card', amount: '' },
   ]);
-  
+   
   const getSplitTotalPaid = () =>
   splitPayments.reduce(
     (sum, p) => sum + (parseFloat(p.amount) || 0),
@@ -76,6 +91,7 @@ export function CheckoutModal({
 const [transactionId, setTransactionId] = useState<string | null>(null);
 
 const [creditType, setCreditType] = useState<'full' | 'partial'>('full');
+
 
 
   const [useInstallments, setUseInstallments] = useState<boolean>(false);
@@ -90,12 +106,12 @@ const [creditType, setCreditType] = useState<'full' | 'partial'>('full');
     payments: InstallmentPayment[],
   }>({
     numberOfPayments: 3,
-    amountPerPayment: Math.ceil(total / 3),
+    amountPerPayment: Math.ceil(netTotal/ 3),
     paymentFrequency: 'monthly',
     startDate: new Date().toISOString().split('T')[0],
     notes: '',
-    downPayment: Math.ceil(total * 0.3), 
-    remainingBalance: Math.ceil(total * 0.7), 
+    downPayment: Math.ceil(netTotal* 0.3), 
+    remainingBalance: Math.ceil(netTotal* 0.7), 
     payments: [],
   });
 
@@ -105,6 +121,8 @@ const [creditType, setCreditType] = useState<'full' | 'partial'>('full');
   const isCustomerVerified = customer.id !== 'walk-in';
 
 
+
+
   const handleAmountPaidChange = (value: string) => {
     setAmountPaid(value);
   };
@@ -112,24 +130,24 @@ const [creditType, setCreditType] = useState<'full' | 'partial'>('full');
  const calculateChange = () => {
   if (paymentMethod === 'split') {
     const paid = getSplitTotalPaid();
-    return paid > total ? paid - total : 0;
+    return paid > netTotal ? paid - netTotal : 0;
   }
 
   const paid = parseFloat(amountPaid) || 0;
-  return paid > total ? paid - total : 0;
+  return paid > netTotal ? paid - netTotal : 0;
 };
 
 
  
 
-const getActualDownPayment = () =>
-  Math.min(
-    Math.max(parseFloat(amountPaid) || 0, installmentPlan.downPayment),
-    total
-  );
+  const getActualDownPayment = () =>
+    Math.min(
+      Math.max(parseFloat(amountPaid) || 0, installmentPlan.downPayment),
+      netTotal - totalDiscount 
+    );
 
 const getRemainingBalance = () =>
-  Math.max(total - getActualDownPayment(), 0);
+  Math.max(netTotal - getActualDownPayment(), 0);
 
 
 const calculateInstallments = () => {
@@ -154,7 +172,7 @@ const calculateInstallments = () => {
 
   useEffect(() => {
     calculateInstallments();
-  }, [useInstallments, installmentPlan.numberOfPayments, installmentPlan.downPayment, amountPaid, total]);
+  }, [useInstallments, installmentPlan.numberOfPayments, installmentPlan.downPayment, amountPaid, netTotal]);
 
 const handleCompleteSale = () => {
   
@@ -171,7 +189,7 @@ const handleCompleteSale = () => {
   if (paymentMethod === 'credit' && creditType === 'partial') {
   const paid = parseFloat(amountPaid) || 0;
 
-  if (paid <= 0 || paid >= total) {
+  if (paid <= 0 || paid >= netTotal) {
     toast.error('Partial credit must be greater than 0 and less than total');
     return;
   }
@@ -244,9 +262,10 @@ const handleCompleteSale = () => {
   customer,
   items: cart,
   subtotal,
-  tax,
+  taxRate: taxRate,
+  tax: customTax,
   total,
-
+  totalDiscount: totalDiscount || 0,
   paymentMethod: useInstallments
     ? 'installment'
     : paymentMethod,
@@ -263,7 +282,7 @@ const handleCompleteSale = () => {
  
   creditBalance:
     paymentMethod === 'credit'
-      ? total -
+      ? netTotal -
         (
           creditType === 'full'
             ? 0
@@ -305,8 +324,8 @@ const handleCompleteSale = () => {
        issuedAt: timestamp,
     creditType: creditType,
     creditBalance: creditType === 'full' 
-      ? total 
-      : total - (parseFloat(amountPaid) || 0),
+      ? netTotal 
+      : netTotal - (parseFloat(amountPaid) || 0),
     amountPaidTowardCredit: creditType === 'partial' 
       ? (parseFloat(amountPaid) || 0)
       : 0,
@@ -331,7 +350,7 @@ const handleCompleteSale = () => {
     installmentPlans.push({
       id: transactionId,
       customer,
-      total,
+      netTotal,
       downPayment: getActualDownPayment(),
       remainingBalance: getRemainingBalance(),
       numberOfPayments: installmentPlan.numberOfPayments,
@@ -384,6 +403,7 @@ useEffect(() => {
         customer={customer}
         cart={cart}
         subtotal={subtotal}
+        discount={totalDiscount}
         tax={tax}
         total={total}
         paymentMethod={useInstallments ? 'installment' : paymentMethod}
@@ -608,6 +628,21 @@ useEffect(() => {
   }
 }, [installmentPlan.downPayment, useInstallments]);
 
+  useEffect(() => {
+    if (!open) {
+      setShowReceipt(false);
+      setPaymentMethod('cash');
+      setAmountPaid('');
+      setTransactionId(null);
+      setCreditType('full');
+      setUseInstallments(false);
+      setSplitPayments([
+        { method: 'cash', amount: '' },
+        { method: 'card', amount: '' },
+      ]);
+    }
+  }, [open]);
+
 
   if (showReceipt) {
     return (
@@ -624,6 +659,7 @@ useEffect(() => {
             customer={customer}
             cart={cart}
             subtotal={subtotal}
+            discount={totalDiscount}
             tax={tax}
             total={total}
             paymentMethod={useInstallments ? 'installment' : paymentMethod}
@@ -655,6 +691,15 @@ useEffect(() => {
               className="bg-black hover:bg-gray-800 text-white flex-1"
               onClick={() => {
                 setShowReceipt(false);
+                setPaymentMethod('cash');
+                setAmountPaid('');
+                setTransactionId(null);
+                setCreditType('full');
+                setUseInstallments(false);
+                setSplitPayments([
+                  { method: 'cash', amount: '' },
+                  { method: 'card', amount: '' },
+                ]);
                 onComplete();
                 onOpenChange(false);
               }}
@@ -670,7 +715,22 @@ useEffect(() => {
 
   return (
     <>
-      <Dialog open={open} onOpenChange={onOpenChange}>
+      <Dialog open={open} onOpenChange={(newOpen) => {
+        if (!newOpen) {
+          setShowReceipt(false);
+          setPaymentMethod('cash');
+          setAmountPaid('');
+          setTransactionId(null);
+          setCreditType('full');
+          setUseInstallments(false);
+          setSplitPayments([
+            { method: 'cash', amount: '' },
+            { method: 'card', amount: '' },
+          ]);
+          setCustomTax(tax);
+        }
+        onOpenChange(newOpen);
+      }}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-gray-900 text-white">
           <DialogHeader>
             <DialogTitle>Complete Sale</DialogTitle>
@@ -718,10 +778,10 @@ useEffect(() => {
                 </div>
               )}
 
-              {paymentMethod === 'split' && getSplitTotalPaid() > total && (
+              {paymentMethod === 'split' && getSplitTotalPaid() > netTotal && (
                 <div className="p-3 bg-green-50 rounded-lg">
                     <div className="text-green-800 font-bold">
-                    Change: NGN {(getSplitTotalPaid() - total).toFixed(2)}
+                    Change: NGN {(getSplitTotalPaid() - netTotal).toFixed(2)}
                     </div>
                 </div>
                 )}
@@ -744,19 +804,33 @@ useEffect(() => {
               )}
               
               <Separator />
+
+                  <div className="p-3 bg-gray-800 rounded-lg">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm">Tax Rate</span>
+                  <span className="font-medium">{taxRate}%</span>
+                </div>
+              </div>
+              
               
               <div className="space-y-1">
                 <div className="flex justify-between">
                   <span className="text-gray-400">Subtotal</span>
                   <span>NGN {subtotal.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-400">Tax</span>
-                  <span>NGN {tax.toFixed(2)}</span>
+              <div className="flex justify-between">
+                          <span className="text-gray-400">Tax ({taxRate}%)</span>
+                  <span>NGN {customTax.toFixed(2)}</span>
                 </div>
+                {totalDiscount > 0 && (
+                  <div className="flex justify-between text-green-400">
+                    <span>Discount</span>
+                    <span>- NGN {totalDiscount.toFixed(2)}</span>
+                  </div>
+                )}
                 <div className="flex justify-between font-bold text-lg">
                   <span>Total</span>
-                  <span>NGN {total.toFixed(2)}</span>
+                  <span>NGN {netTotal.toFixed(2)}</span>
                 </div>
               </div>
             </div>
@@ -856,14 +930,14 @@ useEffect(() => {
                   <>
                     Customer will not pay:
                     <span className="font-bold text-white">
-                      {' '}NGN {total.toFixed(2)}
+                      {' '}NGN {netTotal.toFixed(2)}
                     </span>
                   </>
                 ) : (
                   <>
                     Customer owes:
                     <span className="font-bold text-white">
-                      {' '}NGN {(total - (parseFloat(amountPaid) || 0)).toFixed(2)}
+                      {' '}NGN {(netTotal - (parseFloat(amountPaid) || 0)).toFixed(2)}
                     </span>
                   </>
                 )}
@@ -920,7 +994,7 @@ useEffect(() => {
                         />
                       </div>
 
-                      {parseFloat(amountPaid) > total && (
+                      {parseFloat(amountPaid) > netTotal&& (
                         <div className="p-3 bg-green-50 rounded-lg">
                           <div className="text-green-800 font-bold">
                             Change: NGN {calculateChange().toFixed(2)}
@@ -943,7 +1017,7 @@ useEffect(() => {
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <div className="text-sm text-gray-400">Total Amount</div>
-                      <div className="text-xl font-bold">NGN {total.toFixed(2)}</div>
+                      <div className="text-xl font-bold">NGN {netTotal.toFixed(2)}</div>
                     </div>
                     <div>
                       <div className="text-sm text-gray-400">Required Down Payment</div>
@@ -980,7 +1054,7 @@ useEffect(() => {
                         let numValue = parseFloat(value);
                         
                       
-                        numValue = Math.min(numValue, total);
+                        numValue = Math.min(numValue, netTotal);
                         
                       
                         const rounded = Math.round(numValue * 100) / 100;
@@ -990,7 +1064,7 @@ useEffect(() => {
                       placeholder={installmentPlan.downPayment.toFixed(2)}
                       step="0.01"
                       min="0"
-                      max={total}
+                      max={netTotal}
                     />
 
                   </div>
@@ -1020,12 +1094,24 @@ useEffect(() => {
           </div>
           
           <DialogFooter className="gap-3">
-            <Button
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-            >
-              Cancel Order
-            </Button>
+             <Button
+            variant="outline"
+            onClick={() => {
+              setShowReceipt(false);
+              setPaymentMethod('cash');
+              setAmountPaid('');
+              setTransactionId(null);
+              setCreditType('full');
+              setUseInstallments(false);
+              setSplitPayments([
+                { method: 'cash', amount: '' },
+                { method: 'card', amount: '' },
+              ]);
+              onOpenChange(false);
+            }}
+          >
+            Cancel Order
+          </Button>
             <Button
               className="bg-green-400 hover:bg-green-500 text-black"
               onClick={handleCompleteSale}
@@ -1043,7 +1129,7 @@ useEffect(() => {
         onOpenChange={setShowSplitPayment}
         splitPayments={splitPayments}
         setSplitPayments={setSplitPayments}
-        total={total}
+        netTotal={netTotal}
         setAmountPaid={setAmountPaid}
         setPaymentMethod={setPaymentMethod}
       />
@@ -1054,7 +1140,7 @@ useEffect(() => {
         onOpenChange={setShowInstallmentModal}
         installmentPlan={installmentPlan}
         setInstallmentPlan={setInstallmentPlan}
-        total={total}
+        netTotal={netTotal}
         customer={customer}
       />
     </>
@@ -1067,7 +1153,7 @@ interface SplitPaymentModalProps {
   onOpenChange: (open: boolean) => void;
   splitPayments: { method: string; amount: string }[];
   setSplitPayments: (payments: { method: string; amount: string }[]) => void;
-  total: number;
+  netTotal: number;
   setAmountPaid: (amount: string) => void;
   setPaymentMethod: (method: string) => void;
 }
@@ -1077,7 +1163,7 @@ function SplitPaymentModal({
   onOpenChange,
   splitPayments,
   setSplitPayments,
-  total,
+  netTotal,
   setAmountPaid,
   setPaymentMethod,
 }: SplitPaymentModalProps) {
@@ -1176,12 +1262,12 @@ function SplitPaymentModal({
                 0
               );
 
-              if (toCents(totalPaid) !== toCents(total)) {
+              if (toCents(totalPaid) !== toCents(netTotal)) {
                 toast.error('Split amounts must equal total');
                 return;
               }
 
-              setAmountPaid(total.toFixed(2));
+              setAmountPaid(netTotal.toFixed(2));
               setPaymentMethod('split');
               onOpenChange(false);
             }}
@@ -1200,7 +1286,7 @@ interface InstallmentPlanModalProps {
   onOpenChange: (open: boolean) => void;
   installmentPlan: InstallmentPlan;
   setInstallmentPlan: React.Dispatch<React.SetStateAction<InstallmentPlan>>;
-  total: number;
+  netTotal: number;
   customer: Customer;
   
 }
@@ -1211,7 +1297,7 @@ function InstallmentPlanModal({
   onOpenChange,
   installmentPlan,
   setInstallmentPlan,
-  total,
+  netTotal,
   customer,
 }: InstallmentPlanModalProps) {
 const handleInputChange = <K extends keyof InstallmentPlan>(field: K, value: InstallmentPlan[K]) => {
@@ -1221,7 +1307,7 @@ const handleInputChange = <K extends keyof InstallmentPlan>(field: K, value: Ins
   }));
 };
 
-
+ 
 
 
   const calculatePaymentSchedule = () => {
@@ -1231,7 +1317,7 @@ const handleInputChange = <K extends keyof InstallmentPlan>(field: K, value: Ins
   const totalPayments = installmentPlan.numberOfPayments;
   const numberOfInstallments = totalPayments - 1;
 
-  const remaining = total - installmentPlan.downPayment;
+  const remaining = netTotal- installmentPlan.downPayment;
 
   const base = Number(
     (remaining / numberOfInstallments).toFixed(2)
@@ -1281,6 +1367,8 @@ const handleInputChange = <K extends keyof InstallmentPlan>(field: K, value: Ins
 
   const schedule = calculatePaymentSchedule();
 
+  
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto bg-gray-900 text-white">
@@ -1315,24 +1403,24 @@ const handleInputChange = <K extends keyof InstallmentPlan>(field: K, value: Ins
     id="downPayment"
     type="number"
     min={0}
-    max={total}
+    max={netTotal}
     step="0.01"
     value={installmentPlan.downPayment}
     onChange={(e) => {
       const value = Math.min(
         Math.max(parseFloat(e.target.value) || 0, 0),
-        total
+        netTotal
       );
 
       setInstallmentPlan((prev) => ({
         ...prev,
         downPayment: value,
-        remainingBalance: Math.max(total - value, 0),
+        remainingBalance: Math.max(netTotal- value, 0),
       }));
     }}
   />
   <div className="text-sm text-gray-400">
-    Remaining balance: NGN {(total - installmentPlan.downPayment).toFixed(2)}
+    Remaining balance: NGN {(netTotal- installmentPlan.downPayment).toFixed(2)}
   </div>
 </div>
 
@@ -1393,7 +1481,7 @@ const handleInputChange = <K extends keyof InstallmentPlan>(field: K, value: Ins
             <div className="grid grid-cols-3 gap-4 text-center">
               <div>
                 <div className="text-sm text-gray-400">Total Amount</div>
-                <div className="text-xl font-bold">NGN {total.toFixed(2)}</div>
+                <div className="text-xl font-bold">NGN {netTotal.toFixed(2)}</div>
               </div>
               <div>
                 <div className="text-sm text-gray-400">Down Payment</div>

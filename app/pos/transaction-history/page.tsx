@@ -80,7 +80,7 @@ export default function DailyHistoryPage() {
 );
 
   const totalDiscounts = todaysTransactions.reduce((sum, t) => 
-    sum + (t.discount || 0), 0
+    sum + (t.totalDiscount || 0), 0
   );
   const unsyncedCount = todaysTransactions.filter(t => !t.synced).length;
 

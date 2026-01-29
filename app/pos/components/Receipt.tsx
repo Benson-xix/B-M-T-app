@@ -5,6 +5,7 @@ interface ReceiptProps {
   customer: Customer;
   cart: CartItem[];
   subtotal: number;
+  discount?: number;
   tax: number;
   total: number;
   paymentMethod: string;
@@ -29,6 +30,7 @@ export function Receipt({
   customer,
   cart,
   subtotal,
+  discount,
   tax,
   total,
   paymentMethod,
@@ -302,6 +304,12 @@ export function Receipt({
           <span>Subtotal:</span>
           <span>{formatCurrency(subtotal)}</span>
         </div>
+         {discount && discount > 0 && (
+            <div style={styles.row}>
+              <span>Discount:</span>
+              <span>-{formatCurrency(discount)}</span>
+            </div>
+          )}
         <div style={styles.row}>
           <span>Tax:</span>
           <span>{formatCurrency(tax)}</span>

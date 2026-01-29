@@ -22,7 +22,7 @@ export function SalesKPIs({ transactions }: SalesKPIsProps) {
   
   const totalOrders = transactions.length;
   const totalAmount = transactions.reduce((sum, t) => sum + t.total, 0);
-  const totalDiscount = transactions.reduce((sum, t) => sum + (t.discount || 0), 0);
+  const totalDiscount = transactions.reduce((sum, t) => sum + (t.totalDiscount || 0), 0);
 
 
   const creditTransactions = transactions.filter(t => t.paymentMethod === 'credit');
