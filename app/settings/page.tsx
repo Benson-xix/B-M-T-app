@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -15,7 +15,7 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Building, Lock, UserCog, Plus, Pencil, Trash2, Save, Upload, Eye, EyeOff, CheckCircle } from 'lucide-react';
+import { Building, Lock, UserCog, Plus, Pencil, Trash2, Save, Upload, Eye, EyeOff, CheckCircle, Percent } from 'lucide-react';
 import { InventoryLayout } from '../inventory/components/InventoryLayout';
 import { toast } from 'sonner';
 
@@ -187,6 +187,10 @@ export default function SettingsPage() {
     confirm: false,
   });
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
+    const [taxRate, setTaxRate] = useState<number>(0);
+  const [isTaxDialogOpen, setIsTaxDialogOpen] = useState(false);
+  const [tempTaxRate, setTempTaxRate] = useState<number>(0);
+  
   const [roles, setRoles] = useState<Role[]>([
     {
       id: 'role-1',
@@ -241,6 +245,34 @@ const paginatedRoles = roles.slice(
   currentRolePage * ROLES_PER_PAGE
 );
 
+
+  useEffect(() => {
+    const savedTaxRate = localStorage.getItem('pos_default_tax_rate');
+    if (savedTaxRate) {
+      const rate = parseFloat(savedTaxRate);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setTaxRate(rate);
+      setTempTaxRate(rate);
+    }
+  }, []);
+
+  
+  const handleTaxRateSave = () => {
+    if (tempTaxRate < 0 || tempTaxRate > 100) {
+      toast('Tax rate must be between 0 and 100!');
+      return;
+    }
+
+    setTaxRate(tempTaxRate);
+    localStorage.setItem('pos_default_tax_rate', tempTaxRate.toString());
+    setIsTaxDialogOpen(false);
+    toast('Tax rate updated successfully!');
+  };
+
+  const handleTaxDialogOpen = () => {
+    setTempTaxRate(taxRate);
+    setIsTaxDialogOpen(true);
+  };
 
 
   const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -428,10 +460,96 @@ const paginatedRoles = roles.slice(
     <InventoryLayout>
       <div className="p-4 md:p-6 space-y-6 bg-white text-gray-900">
 
-        <div>
-          <h1 className="text-2xl font-bold">Settings</h1>
-          <p className="text-sm text-gray-500">Manage your business settings and permissions</p>
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-2xl font-bold">Settings</h1>
+            <p className="text-sm text-gray-500">Manage your business settings and permissions</p>
+          </div>
+          
+       
+          <Dialog open={isTaxDialogOpen} onOpenChange={setIsTaxDialogOpen}>
+            <DialogTrigger asChild>
+              <Button 
+                onClick={handleTaxDialogOpen}
+                className="bg-green-600 hover:bg-green-700 text-white flex items-center gap-2"
+              >
+                <Percent className="w-4 h-4" />
+                Set Tax Rate
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-md bg-gray-900 ">
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2">
+                  <Percent className="w-5 h-5" />
+                  Set Default Tax Rate
+                </DialogTitle>
+                <DialogDescription>
+                  Configure the default tax rate used across all sales. This can be adjusted per transaction.
+                </DialogDescription>
+              </DialogHeader>
+
+              <div className="space-y-6 py-4">
+                <Alert className="bg-gray-800 border-blue-200">
+                  <AlertDescription className="text-gray-300">
+                    <CheckCircle className="w-4 h-4 inline mr-2" />
+                    Current tax rate: <span className="font-bold">{taxRate}%</span>
+                  </AlertDescription>
+                </Alert>
+
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="tax-input">Tax Rate (%)</Label>
+                    <div className="flex items-center gap-2">
+                      <Input
+                        id="tax-input"
+                        type="number"
+                        min="0"
+                        max="100"
+                        step="0.1"
+                        value={tempTaxRate}
+                        onChange={(e) => setTempTaxRate(parseFloat(e.target.value) || 0)}
+                        placeholder="Enter tax rate"
+                        className="flex-1"
+                      />
+                      <span className="text-gray-600 font-medium">%</span>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-2">
+                      Enter a value between 0 and 100. Leave as 0 for no tax.
+                    </p>
+                  </div>
+
+                  {tempTaxRate > 0 && (
+                    <div className="p-3 bg-gray-100 rounded-lg">
+                      <p className="text-sm text-gray-700">
+                        <span className="font-medium">Example:</span> On a NGN 1,000 sale, tax would be NGN {(1000 * tempTaxRate / 100).toFixed(2)}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <DialogFooter>
+                <Button 
+                  variant="outline" 
+                  onClick={() => {
+                    setTempTaxRate(taxRate);
+                    setIsTaxDialogOpen(false);
+                  }}
+                >
+                  Cancel
+                </Button>
+                <Button 
+                  onClick={handleTaxRateSave}
+                  className="bg-green-600 hover:bg-green-700 text-white"
+                >
+                  <Save className="w-4 h-4 mr-2" />
+                  Save Tax Rate
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </div>
+
 
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full ">

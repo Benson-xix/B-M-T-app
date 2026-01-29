@@ -333,7 +333,7 @@ const calculateDiscount = () => {
                 <Clock className="h-4 w-4" />
                 Session: {formatTime(sessionTime)}
               </div>
-           <div className="flex items-center gap-2 ml-auto">
+           <div  className="hidden items-center gap-2 ml-auto">
               <Label htmlFor="taxRate" className="text-sm">Set Sale Tax Rate:</Label>
               <Input
                 id="taxRate"
