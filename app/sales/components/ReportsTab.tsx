@@ -13,7 +13,8 @@ import {
   FileText, 
   Download, 
   Eye, 
-  RefreshCw
+  RefreshCw,
+  Divide
 } from "lucide-react";
 import { Transaction } from '@/app/utils/type';
 
@@ -71,7 +72,8 @@ export function ReportsTab({ transactions, dateRange }: ReportsTabProps) {
   const [includeProductBreakdown, setIncludeProductBreakdown] = useState<boolean>(true);
   const [selectedCashier, setSelectedCashier] = useState<string>('all');
   const [generatedReports, setGeneratedReports] = useState<GeneratedReport[]>([]);
-  
+    const [hasAttemptedGenerate, setHasAttemptedGenerate] = useState<boolean>(false);
+
   const reportTypes: ReportTypeOption[] = [
     { value: 'daily', label: 'Daily Sales' },
     { value: 'weekly', label: 'Weekly Sales' },
@@ -106,6 +108,7 @@ export function ReportsTab({ transactions, dateRange }: ReportsTabProps) {
   };
 
   const generateReport = (): void => {
+     setHasAttemptedGenerate(true); 
     const start = new Date(reportStartDate);
     const end = new Date(reportEndDate);
     
@@ -1032,22 +1035,22 @@ const viewReport = (report: GeneratedReport): void => {
             )}
           </CardContent>
         </Card>
-      ) : transactions.length === 0 ? (
-      <Card className='bg-gray-900 text-white'>
-        <CardHeader>
-          <CardTitle>No Data Available</CardTitle>
-          <CardDescription>
-            No transactions found for the selected date range and filters
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="text-center py-8">
-            <FileText className="h-12 w-12 text-gray-400 mx-auto mb-3" />
-            <p className="text-gray-400">Generate a report to see results</p>
-          </div>
-        </CardContent>
-      </Card>
-    ) : null}
+      ) : hasAttemptedGenerate ? (
+        <Card className='bg-gray-900 text-white'>
+          <CardHeader>
+            <CardTitle>No Data Available</CardTitle>
+            <CardDescription>
+              No transactions found for the selected date range and filters
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="text-center py-8">
+              <FileText className="h-12 w-12 text-gray-400 mx-auto mb-3" />
+              <p className="text-gray-400">Try adjusting your date range or filters</p>
+            </div>
+          </CardContent>
+        </Card>
+      ) : null}
     </div>
   );
 }
