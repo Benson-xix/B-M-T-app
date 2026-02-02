@@ -125,6 +125,8 @@ export function ReportsTab({ transactions, dateRange }: ReportsTabProps) {
           return transactionDate === dateStr;
         });
         
+        
+       if (dayTransactions.length > 0) {
         const total = dayTransactions.reduce((sum, t) => sum + t.total, 0);
         
         reports.push({
@@ -145,7 +147,8 @@ export function ReportsTab({ transactions, dateRange }: ReportsTabProps) {
           }
         });
       }
-    } else if (reportType === 'weekly') {
+    }
+  }  else if (reportType === 'weekly') {
       const current = new Date(start);
       let weekNumber = 1;
       
@@ -159,6 +162,7 @@ export function ReportsTab({ transactions, dateRange }: ReportsTabProps) {
           return transactionDate >= weekStart && transactionDate <= weekEnd;
         });
         
+       if (weekTransactions.length > 0) {
         const total = weekTransactions.reduce((sum, t) => sum + t.total, 0);
         
         reports.push({
@@ -178,11 +182,12 @@ export function ReportsTab({ transactions, dateRange }: ReportsTabProps) {
             cashier: selectedCashier,
           }
         });
-        
-        weekNumber++;
-        current.setDate(current.getDate() + 7);
       }
-    } else if (reportType === 'monthly') {
+      
+      weekNumber++;
+      current.setDate(current.getDate() + 7);
+    }
+  } else if (reportType === 'monthly') {
       const current = new Date(start.getFullYear(), start.getMonth(), 1);
       const endMonth = new Date(end.getFullYear(), end.getMonth(), 1);
       
@@ -195,6 +200,7 @@ export function ReportsTab({ transactions, dateRange }: ReportsTabProps) {
           return transactionDate >= monthStart && transactionDate <= monthEnd;
         });
         
+       if (monthTransactions.length > 0) {
         const total = monthTransactions.reduce((sum, t) => sum + t.total, 0);
         
         const monthName = monthStart.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
@@ -216,10 +222,11 @@ export function ReportsTab({ transactions, dateRange }: ReportsTabProps) {
             cashier: selectedCashier,
           }
         });
-        
-        current.setMonth(current.getMonth() + 1);
       }
-    } else if (reportType === 'yearly') {
+      
+      current.setMonth(current.getMonth() + 1);
+    }
+  } else if (reportType === 'yearly') {
       for (let year = start.getFullYear(); year <= end.getFullYear(); year++) {
         const yearStart = new Date(year, 0, 1);
         const yearEnd = new Date(year, 11, 31);
@@ -229,6 +236,7 @@ export function ReportsTab({ transactions, dateRange }: ReportsTabProps) {
           return transactionDate.getFullYear() === year;
         });
         
+      if (yearTransactions.length > 0) {
         const total = yearTransactions.reduce((sum, t) => sum + t.total, 0);
         
         reports.push({
@@ -250,9 +258,10 @@ export function ReportsTab({ transactions, dateRange }: ReportsTabProps) {
         });
       }
     }
-    
-    setGeneratedReports(reports);
-  };
+  }
+  
+  setGeneratedReports(reports);
+};
 
 const viewReport = (report: GeneratedReport): void => {
   const filteredTransactions = transactions.filter(t => {
@@ -919,7 +928,7 @@ const viewReport = (report: GeneratedReport): void => {
       </Card>
       
      
-      {generatedReports.length > 0 && (
+      {generatedReports.length > 0 ? (
         <Card className='bg-gray-900 text-white'>
           <CardHeader>
             <div className="flex items-center justify-between">
@@ -1023,7 +1032,22 @@ const viewReport = (report: GeneratedReport): void => {
             )}
           </CardContent>
         </Card>
-      )}
+      ) : transactions.length === 0 ? (
+      <Card className='bg-gray-900 text-white'>
+        <CardHeader>
+          <CardTitle>No Data Available</CardTitle>
+          <CardDescription>
+            No transactions found for the selected date range and filters
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center py-8">
+            <FileText className="h-12 w-12 text-gray-400 mx-auto mb-3" />
+            <p className="text-gray-400">Generate a report to see results</p>
+          </div>
+        </CardContent>
+      </Card>
+    ) : null}
     </div>
   );
 }
