@@ -1,4 +1,5 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { TrendingUp, Image as ImageIcon } from "lucide-react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
@@ -66,9 +67,16 @@ export function TopProductsWidget() {
            
               <div className="flex-1 min-w-0 flex flex-col md:flex-row md:items-center md:justify-between gap-2 w-full">
                 <div className="flex-1 min-w-0">
-                  <h4 className="font-semibold text-gray-900 truncate group-hover:text-gray-700">
-                    {product.name}
-                  </h4>
+                 <Tooltip>
+                      <TooltipTrigger asChild>
+                        <h4 className="font-semibold text-gray-900 truncate group-hover:text-gray-700 cursor-help">
+                          {product.name}
+                        </h4>
+                      </TooltipTrigger>
+                      <TooltipContent className="bg-gray-900 text-white border border-gray-700">
+                        <p>{product.name}</p>
+                      </TooltipContent>
+                    </Tooltip>
                   <div className="flex flex-wrap md:flex-nowrap items-center gap-2 text-sm text-gray-600 mt-1">
                     <span className="bg-gray-100 px-2 py-0.5 rounded text-xs">{product.category}</span>
                     <span>{product.sold} sold</span>

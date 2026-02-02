@@ -126,17 +126,12 @@ const getStockStatus = (
                       <div className="text-sm text-gray-600 truncate">
                         {variant.name}
                       </div>
-                      <div className="text-xs text-gray-500">
+                     <div  className="  grid grid-cols-1   xl:flex items-center justify-between">
+                       <div className="text-xs text-gray-500">
                         {product.brand}
                       </div>
-                    </div>
-                    
-                    <div className="flex items-center justify-between">
-                      <div className="font-bold text-lg text-gray-900">
-                        NGN {variant.sellingPrice.toFixed(2)}
-                      </div>
-                      
-                      <Button
+
+                          <Button
                         size="sm"
                         className={`flex items-center gap-1 ${
                           variant.quantity === 0
@@ -149,6 +144,15 @@ const getStockStatus = (
                         <ShoppingCart className="h-4 w-4" />
                         Add
                       </Button>
+                     </div>
+                    </div>
+                    
+                    <div className="flex items-center ">
+                      <div className="font-bold text-normal text-gray-900 w-full">
+                        NGN {variant.sellingPrice.toFixed(2)}
+                      </div>
+                      
+                   
                     </div>
                     
                   

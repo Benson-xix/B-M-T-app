@@ -27,7 +27,7 @@ import { Expense, ExpenseCategory, loginAttempts, Transaction } from '../utils/t
 import { ExpensesTable } from '../expenses/component/ExpensesTable';
 import { toast } from 'sonner';
 import { CreditInstallmentOverview } from './components/SalesCategoryChart';
-
+import { format } from 'date-fns';
 export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState("overview");
   const [dateRange, setDateRange] = useState("thisMonth");
@@ -72,40 +72,86 @@ const paginatedLogins = loginAttempts.slice(
     }
 
     try {
-      const savedExpenses = JSON.parse(localStorage.getItem('expenses') || '[]');
+       const savedExpenses = JSON.parse(localStorage.getItem('expenses') || '[]');
+    if (savedExpenses.length === 0) {
+     
+      const mockExpenses: Expense[] = [
+        {
+          id: 'exp-1',
+          name: 'Office Stationery',
+          categoryId: 'cat-1', 
+          amount: 15000,
+          note: 'Pens, paper, notebooks',
+          status: 'approved',
+          createdBy: 'Admin',
+          expenseDate: new Date().toISOString(),
+          createdAt: new Date().toISOString(),
+          month: format(new Date(), 'MMM yyyy'),
+        },
+        {
+          id: 'exp-2',
+          name: 'Internet Subscription',
+          categoryId: 'cat-2',
+          amount: 25000,
+          note: 'Monthly ISP bill',
+          status: 'approved',
+          createdBy: 'Admin',
+          expenseDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+          createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+          month: format(new Date(), 'MMM yyyy'),
+        },
+        {
+          id: 'exp-3',
+          name: 'Facebook Ads',
+          categoryId: 'cat-3',
+          amount: 40000,
+          note: 'Product campaign',
+          status: 'pending',
+          createdBy: 'Admin',
+          expenseDate: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+          createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+          month: format(new Date(), 'MMM yyyy'),
+        },
+      ];
+      localStorage.setItem('expenses', JSON.stringify(mockExpenses));
+      setExpenses(mockExpenses);
+    } else {
       setExpenses(savedExpenses);
-    } catch {
-      setExpenses([]);
     }
-  }, []);
+  } catch {
+    setExpenses([]);
+  }
+}, []);
 
-  const handleDeleteExpense = (id: string) => {
-    if (confirm('Are you sure you want to delete this expense?')) {
-      const updated = expenses.filter(exp => exp.id !== id);
-      setExpenses(updated);
-      localStorage.setItem('expenses', JSON.stringify(updated));
-    }
-  };
+
 
   const handleViewInvoice = (expense: Expense) => {
     window.open(`/expenses/invoices/${expense.id}`, '_blank');
   };
 
-  const handleApprove = (id: string) => {
-    const updated = expenses.map(exp =>
-      exp.id === id ? { ...exp, status: 'approved' as const } : exp
-    );
+const handleDeleteExpense = (id: string) => {
+  if (confirm('Are you sure you want to delete this expense?')) {
+    const updated = expenses.filter(exp => exp.id !== id);
     setExpenses(updated);
-    localStorage.setItem('expenses', JSON.stringify(updated));
-  };
+    localStorage.setItem('expenses', JSON.stringify(updated));  // Add this
+  }
+};
 
-  const handleReject = (id: string) => {
-    const updated = expenses.map(exp =>
-      exp.id === id ? { ...exp, status: 'rejected' as const } : exp
-    );
-    setExpenses(updated);
-    localStorage.setItem('expenses', JSON.stringify(updated));
-  };
+const handleApprove = (id: string) => {
+  const updated = expenses.map(exp =>
+    exp.id === id ? { ...exp, status: 'approved' as const } : exp
+  );
+  setExpenses(updated);
+  localStorage.setItem('expenses', JSON.stringify(updated));  // Add this
+};
+
+const handleReject = (id: string) => {
+  const updated = expenses.map(exp =>
+    exp.id === id ? { ...exp, status: 'rejected' as const } : exp
+  );
+  setExpenses(updated);
+  localStorage.setItem('expenses', JSON.stringify(updated));  // Add this
+};
 
   const handleDateRangeChange = (range: string) => {
     setDateRange(range);

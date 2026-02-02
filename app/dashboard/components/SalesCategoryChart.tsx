@@ -199,7 +199,7 @@ const getTotalDueAmount = (plan: InstallmentPlan): number => {
                 );
               })}             
              <Link href='/sales/installment-page?filter=overdue' className="pt-4 border-t">
-              <Button variant="link" className=" text-green-600 hover:text-green-700">
+   <Button size="sm" variant='link' className="bg-green-600 hover:bg-green-700 text-white">
                 View All Due Installments →
               </Button>
             </Link>
@@ -319,7 +319,7 @@ const getTotalDueAmount = (plan: InstallmentPlan): number => {
               
               <div className="pt-4 border-t">
                 <Link href='/sales'>
-                 <Button size="sm" className="bg-purple-600 hover:bg-purple-700 text-white">
+                 <Button size="sm" variant='link' className="bg-green-600 hover:bg-green-700 text-white">
                   View Sales
                  </Button>
                 </Link>
