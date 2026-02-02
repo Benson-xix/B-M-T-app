@@ -20,7 +20,7 @@ import {
   ChevronRight
 } from "lucide-react";
 import { Transaction } from '@/app/utils/type';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -35,7 +35,7 @@ interface TransactionsTabProps {
   transactions: Transaction[];
   paymentMethodFilter: string;
   onPaymentMethodFilterChange: (method: string) => void;
-
+   highlightedTransactionId?: string;
 }
 
 const ITEMS_PER_PAGE = 10;
@@ -44,7 +44,8 @@ const ITEMS_PER_PAGE = 10;
 export function TransactionsTab({ 
   transactions, 
   paymentMethodFilter,
-  onPaymentMethodFilterChange 
+  onPaymentMethodFilterChange ,
+  highlightedTransactionId,
 }: TransactionsTabProps) {
   const [searchQuery, setSearchQuery] = useState('');
    const [currentPage, setCurrentPage] = useState(1);
@@ -64,6 +65,17 @@ export function TransactionsTab({
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const endIndex = startIndex + ITEMS_PER_PAGE;
   const paginatedTransactions = filteredTransactions.slice(startIndex, endIndex);
+
+  useEffect(() => {
+    if (highlightedTransactionId) {
+      const highlightedIndex = filteredTransactions.findIndex(t => t.id === highlightedTransactionId);
+      if (highlightedIndex !== -1) {
+        const pageNumber = Math.floor(highlightedIndex / ITEMS_PER_PAGE) + 1;
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setCurrentPage(pageNumber);
+      }
+    }
+  }, [highlightedTransactionId, filteredTransactions]);
 
   const handleFilterChange = (filterValue: string) => {
     setCurrentPage(1);
@@ -347,7 +359,10 @@ export function TransactionsTab({
               </TableHeader>
               <TableBody>
                 {paginatedTransactions.map((transaction) => (
-                  <TableRow key={transaction.id}>
+                 <TableRow 
+                    key={transaction.id}
+                    className={highlightedTransactionId === transaction.id ? 'bg-yellow-50 bg-opacity-10' : ''}
+                  >
                     <TableCell className="font-mono text-sm">
                       {transaction.id}
                     </TableCell>

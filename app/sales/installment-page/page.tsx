@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-
+import { useSearchParams } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
@@ -15,7 +15,6 @@ import {
   Filter, 
   Search, 
   Clock, 
-  CheckCircle,
   AlertCircle,
   TrendingUp,
   RefreshCcw
@@ -421,16 +420,32 @@ function printInstallmentReceiptFromTransaction(
 
 export default function InstallmentsPage() {
   const [installments, setInstallments] = useState<InstallmentPlan[]>([]);
-
+  const searchParams = useSearchParams();
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [dateFilter, setDateFilter] = useState<string>('');
+ const [highlightedPlanId, setHighlightedPlanId] = useState<string>('');
 
   const [selectedPlan, setSelectedPlan] = useState<InstallmentPlan | null>(null);
 const [selectedPayment, setSelectedPayment] = useState<number | null>(null);
 const [paymentAmount, setPaymentAmount] = useState('');
 const [paymentMethod, setPaymentMethod] =
   useState<'cash' | 'card' | 'transfer'>('cash');
+
+
+    useEffect(() => {
+    const planId = searchParams.get('planId');
+    if (planId) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setHighlightedPlanId(planId);
+    }
+
+  
+    const filter = searchParams.get('filter');
+    if (filter === 'overdue') {
+      setStatusFilter('overdue');
+    }
+  }, [searchParams]);
 
 const [expandedPlanId, setExpandedPlanId] = useState<string | null>(null);
 
@@ -525,24 +540,35 @@ paidAmount: Number(
 }, []);
 
 
-const filteredInstallments = installments.filter(plan => {
-  if (searchQuery) {
-    const q = searchQuery.toLowerCase();
-    if (!plan.customer.name.toLowerCase().includes(q) && !plan.id.toLowerCase().includes(q)) {
+  const filteredInstallments = installments.filter(plan => {
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      if (!plan.customer.name.toLowerCase().includes(q) && !plan.id.toLowerCase().includes(q)) {
+        return false;
+      }
+    }
+
+    
+    if (statusFilter === 'overdue') {
+      const hasOverduePayments = plan.payments.some(p => p.status === 'overdue');
+      const hasOverdueOrPendingPayments = plan.payments.some(payment => 
+        (payment.status === 'pending' || payment.status === 'overdue') && 
+        new Date(payment.dueDate) <= new Date()
+      );
+      
+      if (!hasOverduePayments && !hasOverdueOrPendingPayments) {
+        return false;
+      }
+    } else if (statusFilter !== 'all' && plan.status !== statusFilter) {
       return false;
     }
-  }
 
-  if (statusFilter !== 'all' && plan.status !== statusFilter) {
-    return false;
-  }
+    if (dateFilter && plan.startDate < dateFilter) {
+      return false;
+    }
 
-  if (dateFilter && plan.startDate < dateFilter) {
-    return false;
-  }
-
-  return true;
-});
+    return true;
+  });
 
 
 useEffect(() => {
@@ -924,7 +950,14 @@ const paginatedInstallments = sortedInstallments.slice(
             ) : (
               <div className="space-y-6">
                 {paginatedInstallments.map((plan) => (
-                  <Card key={plan.id} className="overflow-hidden bg-white text-gray-900 border border-gray-200 shadow-2xl rounded-2xl" >
+              <Card 
+          key={plan.id} 
+          className={`overflow-hidden bg-white text-gray-900 border ${
+            highlightedPlanId === plan.id 
+              ? 'border-yellow-400 bg-yellow-50 shadow-lg' 
+              : 'border-gray-200'
+          } shadow-2xl rounded-2xl`}
+        >
                     <CardContent className="p-0">
                  
                       <div className="p-4 bg-gray-50 border-b">

@@ -95,26 +95,34 @@ export interface Draft {
 
 export interface InstallmentPayment {
   paymentNumber: number;
-  amount: number;
+  amount?: number;
   date?: string;
   dueDate: string;
   status: 'paid' | 'pending' | 'overdue';
   type?: 'down_payment' | 'installment';
   method?: string;
   notes?: string;
+  expectedAmount?: number; 
+  paidAmount?: number; 
+  paidDate?: string; 
 }
 
-
 export interface InstallmentPlan {
+  id: string;
+  customer: Customer;  
+  total: number;  
+  downPayment: number;
+  remainingBalance: number;
   numberOfPayments: number;
   amountPerPayment: number;
   paymentFrequency: 'daily' | 'weekly' | 'monthly';
   startDate: string;
   endDate?: string;
   notes: string;
-  downPayment: number;
-  remainingBalance: number;
   payments: InstallmentPayment[];
+  status: 'active' | 'completed' | 'defaulted';
+  transactionId?: string;  
+  customerId?: string; 
   interestRate?: number;
   lateFee?: number;
 }

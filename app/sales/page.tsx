@@ -1,9 +1,8 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useSearchParams } from 'next/navigation';
+import { Tabs, TabsContent,} from "@/components/ui/tabs";
 import { Transaction } from '@/app/utils/type';
 import { InventoryLayout } from '../inventory/components/InventoryLayout';
 import { SalesHeader } from './components/SalesHeader';
@@ -14,6 +13,7 @@ import { TransactionsTab } from './components/TransactionsTab';
 import { ReportsTab } from './components/ReportsTab';
 
 export default function SalesPage() {
+    const searchParams = useSearchParams();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [activeTab, setActiveTab] = useState('overview');
   const [dateRange, setDateRange] = useState({
@@ -22,9 +22,11 @@ export default function SalesPage() {
     endDate: new Date().toISOString().split('T')[0],
   });
   const [paymentMethodFilter, setPaymentMethodFilter] = useState('all');
+    const [transactionIdFilter, setTransactionIdFilter] = useState('');
+      const [isHydrated, setIsHydrated] = useState(false);
 
 
-  useEffect(() => {
+      useEffect(() => {
     const loadTransactions = () => {
       try {
         const savedTransactions = JSON.parse(localStorage.getItem('pos_transactions') || '[]');
@@ -39,45 +41,96 @@ export default function SalesPage() {
     return () => clearInterval(interval);
   }, []);
 
+  useEffect(() => {
+    const tab = searchParams.get('tab');
+    const filter = searchParams.get('filter');
+    const txId = searchParams.get('txId');
+    const startDate = searchParams.get('startDate');
+    const endDate = searchParams.get('endDate');
+
+    if (tab === 'transactions') {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setActiveTab('transactions');
+    }
+
+    if (filter === 'credit') {
+      setPaymentMethodFilter('credit');
+    } else if (filter === 'installment') {
+      setPaymentMethodFilter('installment');
+    }
+
+    if (txId) {
+      setTransactionIdFilter(txId);
+    }
+
+  
+    if (startDate && endDate) {
+      setDateRange({
+        filter: 'custom',
+        startDate,
+        endDate,
+      });
+    }
+
+    setIsHydrated(true);
+  }, [searchParams]);
+
+
+
+
 
   const filteredTransactions = useMemo(() => {
-  let filtered = transactions;
+    let filtered = transactions;
 
-  if (dateRange.filter === 'custom') {
-    filtered = filtered.filter(t => {
-      const transactionDate = new Date(t.timestamp).toISOString().split('T')[0];
-      return transactionDate >= dateRange.startDate && transactionDate <= dateRange.endDate;
-    });
-  } else if (dateRange.filter === 'today') {
-    const today = new Date().toDateString();
-    filtered = filtered.filter(t => new Date(t.timestamp).toDateString() === today);
-  } else if (dateRange.filter === 'yesterday') {
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
-    const yesterdayStr = yesterday.toDateString();
-    filtered = filtered.filter(t => new Date(t.timestamp).toDateString() === yesterdayStr);
-  } else if (dateRange.filter === 'thisWeek') {
-    const now = new Date();
-    const startOfWeek = new Date(now.setDate(now.getDate() - now.getDay()));
-    startOfWeek.setHours(0, 0, 0, 0);
-    filtered = filtered.filter(t => new Date(t.timestamp) >= startOfWeek);
-  } else if (dateRange.filter === 'thisMonth') {
-    const now = new Date();
-    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-    filtered = filtered.filter(t => new Date(t.timestamp) >= startOfMonth);
-  } else if (dateRange.filter === 'thisYear') {
-    const now = new Date();
-    const startOfYear = new Date(now.getFullYear(), 0, 1);
-    filtered = filtered.filter(t => new Date(t.timestamp) >= startOfYear);
+    if (dateRange.filter === 'custom') {
+      filtered = filtered.filter(t => {
+        const transactionDate = new Date(t.timestamp).toISOString().split('T')[0];
+        return transactionDate >= dateRange.startDate && transactionDate <= dateRange.endDate;
+      });
+    } else if (dateRange.filter === 'today') {
+      const today = new Date().toDateString();
+      filtered = filtered.filter(t => new Date(t.timestamp).toDateString() === today);
+    } else if (dateRange.filter === 'yesterday') {
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      const yesterdayStr = yesterday.toDateString();
+      filtered = filtered.filter(t => new Date(t.timestamp).toDateString() === yesterdayStr);
+    } else if (dateRange.filter === 'thisWeek') {
+      const now = new Date();
+      const startOfWeek = new Date(now.setDate(now.getDate() - now.getDay()));
+      startOfWeek.setHours(0, 0, 0, 0);
+      filtered = filtered.filter(t => new Date(t.timestamp) >= startOfWeek);
+    } else if (dateRange.filter === 'thisMonth') {
+      const now = new Date();
+      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+      filtered = filtered.filter(t => new Date(t.timestamp) >= startOfMonth);
+    } else if (dateRange.filter === 'thisYear') {
+      const now = new Date();
+      const startOfYear = new Date(now.getFullYear(), 0, 1);
+      filtered = filtered.filter(t => new Date(t.timestamp) >= startOfYear);
+    }
+
+    if (paymentMethodFilter !== 'all') {
+      filtered = filtered.filter(t => t.paymentMethod === paymentMethodFilter);
+    }
+
+    
+    if (transactionIdFilter) {
+      filtered = filtered.filter(t => t.id === transactionIdFilter);
+    }
+
+    return filtered;
+  }, [transactions, dateRange, paymentMethodFilter, transactionIdFilter]);
+
+ if (!isHydrated) {
+    return (
+      <InventoryLayout>
+        <div className="space-y-6 p-1 md:p-4 lg:p-6 text-gray-900 flex items-center justify-center h-screen">
+          <div className="text-gray-600">Loading sales data...</div>
+        </div>
+      </InventoryLayout>
+    );
   }
-
-  if (paymentMethodFilter !== 'all') {
-    filtered = filtered.filter(t => t.paymentMethod === paymentMethodFilter);
-  }
-
-  return filtered;
-}, [transactions, dateRange, paymentMethodFilter]);
-
 
   return (
     <InventoryLayout>
@@ -100,6 +153,7 @@ export default function SalesPage() {
       transactions={filteredTransactions}
       paymentMethodFilter={paymentMethodFilter}
       onPaymentMethodFilterChange={setPaymentMethodFilter}
+       highlightedTransactionId={transactionIdFilter}
     />
   </TabsContent>
   <TabsContent value="reports">

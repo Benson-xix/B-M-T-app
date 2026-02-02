@@ -20,8 +20,7 @@ import { toast } from 'sonner';
 
 type Staff = {
   id: string;
-  firstName: string;
-  lastName: string;
+  full_name: string;
   username: string;
   email: string;
   phone: string;
@@ -46,8 +45,7 @@ export default function StaffPage() {
   const [staffs, setStaffs] = useState<Staff[]>([
     {
       id: 'staff-1',
-      firstName: 'John',
-      lastName: 'Doe',
+      full_name: 'John Doe',
       username: 'johndoe',
       email: 'john@business.com',
       phone: '+234 123 456 7890',
@@ -60,8 +58,7 @@ export default function StaffPage() {
     },
     {
       id: 'staff-2',
-      firstName: 'Jane',
-      lastName: 'Smith',
+      full_name: 'Jane Smith',
       username: 'janesmith',
       email: 'jane@business.com',
       phone: '+234 098 765 4321',
@@ -74,8 +71,7 @@ export default function StaffPage() {
     },
     {
       id: 'staff-3',
-      firstName: 'Robert',
-      lastName: 'Johnson',
+      full_name: 'Robert Johnson',
       username: 'robertj',
       email: 'robert@business.com',
       phone: '+234 112 233 4455',
@@ -88,8 +84,7 @@ export default function StaffPage() {
     },
     {
       id: 'staff-4',
-      firstName: 'Sarah',
-      lastName: 'Williams',
+      full_name: 'Sarah Williams',
       username: 'sarahw',
       email: 'sarah@business.com',
       phone: '+234 556 677 8899',
@@ -122,8 +117,7 @@ const paginatedStaffs = staffs.slice(
 
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [newStaff, setNewStaff] = useState({
-    firstName: '',
-    lastName: '',
+    full_name: '',  
     email: '',
     phone: '',
     address: '',
@@ -163,28 +157,21 @@ const paginatedStaffs = staffs.slice(
     return username;
   };
 
-
-  const handleInputChange = (field: string, value: string) => {
-    setNewStaff(prev => ({ ...prev, [field]: value }));
-    
-
-    if ((field === 'firstName' || field === 'lastName') && newStaff.firstName && newStaff.lastName) {
-      const username = generateUsername(
-        field === 'firstName' ? value : newStaff.firstName,
-        field === 'lastName' ? value : newStaff.lastName
-      );
-      setGeneratedUsername(username);
-    }
-    
-   
-    if (newStaff.generatePassword && !generatedPassword) {
-      setGeneratedPassword(generateRandomPassword());
-    }
-  };
-
+const handleInputChange = (field: string, value: string) => {
+  setNewStaff(prev => ({ ...prev, [field]: value }));
+  
+  
+  if (field === 'full_name' && value.trim()) {
+    const nameParts = value.trim().split(' ');
+    const firstName = nameParts[0];
+    const lastName = nameParts[nameParts.length - 1] || '';
+    const username = generateUsername(firstName, lastName);
+    setGeneratedUsername(username);
+  }
+};
  
   const handleAddStaff = () => {
-    if (!newStaff.firstName || !newStaff.lastName || !newStaff.email || !newStaff.role) {
+    if (!newStaff.full_name || !newStaff.email || !newStaff.role) {
       toast('Please fill in all required fields');
       return;
     }
@@ -197,8 +184,7 @@ const paginatedStaffs = staffs.slice(
 
     const newStaffObj: Staff = {
       id: `staff-${Date.now()}`,
-      firstName: newStaff.firstName,
-      lastName: newStaff.lastName,
+      full_name: newStaff.full_name,
       username: generatedUsername,
       email: newStaff.email,
       phone: newStaff.phone,
@@ -220,8 +206,7 @@ const paginatedStaffs = staffs.slice(
 
  
     setNewStaff({
-      firstName: '',
-      lastName: '',
+      full_name: '',
       email: '',
       phone: '',
       address: '',
@@ -249,7 +234,7 @@ const paginatedStaffs = staffs.slice(
     const staff = staffs.find(s => s.id === id);
     if (!staff) return;
     
-    if (confirm(`Are you sure you want to delete ${staff.firstName} ${staff.lastName}?`)) {
+    if (confirm(`Are you sure you want to delete ${staff.full_name}?`)) {
     
       setRoles(roles.map(role => 
         role.name === staff.role 
@@ -320,28 +305,17 @@ const paginatedStaffs = staffs.slice(
               <div className="space-y-6 py-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="firstName">
-                      First Name <span className="text-red-500">*</span>
+                    <Label htmlFor="fullName">
+                      Full Name <span className="text-red-500">*</span>
                     </Label>
                     <Input
-                      id="firstName"
-                      value={newStaff.firstName}
-                      onChange={(e) => handleInputChange('firstName', e.target.value)}
+                      id="fullName"
+                      value={newStaff.full_name}
+                      onChange={(e) => handleInputChange('full_name', e.target.value)}
                       placeholder="John"
                     />
                   </div>
                   
-                  <div className="space-y-2">
-                    <Label htmlFor="lastName">
-                      Last Name <span className="text-red-500">*</span>
-                    </Label>
-                    <Input
-                      id="lastName"
-                      value={newStaff.lastName}
-                      onChange={(e) => handleInputChange('lastName', e.target.value)}
-                      placeholder="Doe"
-                    />
-                  </div>
                   
                   <div className="space-y-2">
                     <Label htmlFor="email">
@@ -549,8 +523,7 @@ const paginatedStaffs = staffs.slice(
                   onClick={() => {
                     setIsAddDialogOpen(false);
                     setNewStaff({
-                      firstName: '',
-                      lastName: '',
+                      full_name: '',
                       email: '',
                       phone: '',
                       address: '',
@@ -614,11 +587,11 @@ const paginatedStaffs = staffs.slice(
                           <Avatar className="h-8 w-8">
                             <AvatarImage src={staff.avatar} />
                             <AvatarFallback>
-                              {staff.firstName[0]}{staff.lastName[0]}
+                              {staff.full_name.split(' ')[0][0]}{staff.full_name.split(' ')[1][0]}
                             </AvatarFallback>
                           </Avatar>
                           <div>
-                            <p className="font-medium">{staff.firstName} {staff.lastName}</p>
+                            <p className="font-medium">{staff.full_name}</p>
                             <p className="text-sm text-gray-500">{staff.email}</p>
                           </div>
                         </div>

@@ -95,25 +95,30 @@ const [creditType, setCreditType] = useState<'full' | 'partial'>('full');
 
 
   const [useInstallments, setUseInstallments] = useState<boolean>(false);
-  const [installmentPlan, setInstallmentPlan] = useState<{
-    numberOfPayments: number;
-    amountPerPayment: number;
-    paymentFrequency: 'daily' | 'weekly' | 'monthly';
-    startDate: string;
-    notes: string;
-    downPayment: number;
-    remainingBalance: number;
-    payments: InstallmentPayment[],
-  }>({
-    numberOfPayments: 3,
-    amountPerPayment: Math.ceil(netTotal/ 3),
-    paymentFrequency: 'monthly',
-    startDate: new Date().toISOString().split('T')[0],
-    notes: '',
-    downPayment: Math.ceil(netTotal* 0.3), 
-    remainingBalance: Math.ceil(netTotal* 0.7), 
-    payments: [],
-  });
+const [installmentPlan, setInstallmentPlan] = useState<InstallmentPlan>({
+  id: '', 
+  customer: customer, 
+  total: netTotal,
+  downPayment: Math.ceil(netTotal * 0.3),
+  remainingBalance: Math.ceil(netTotal * 0.7),
+  numberOfPayments: 3,
+  amountPerPayment: Math.ceil(netTotal / 3),
+  paymentFrequency: 'monthly',
+  startDate: new Date().toISOString().split('T')[0],
+  notes: '',
+  payments: [],
+  status: 'active',
+});
+
+useEffect(() => {
+  setInstallmentPlan(prev => ({
+    ...prev,
+    customer: customer,
+    total: netTotal,
+    remainingBalance: Math.ceil(netTotal * 0.7),
+    amountPerPayment: Math.ceil(netTotal / 3),
+  }));
+}, [customer, netTotal]);
 
   
   const isCustomerEligibleForInstallments = customer.id !== 'walk-in';
@@ -157,8 +162,7 @@ const calculateInstallments = () => {
   
   if (installmentPlan.numberOfPayments < 2) return;
   
-  const numberOfInstallments =
-  installmentPlan.numberOfPayments - 1;
+  const numberOfInstallments = installmentPlan.numberOfPayments - 1;
   const perPayment = Number((remaining / numberOfInstallments).toFixed(2));
 
   setInstallmentPlan((prev) => ({
@@ -349,8 +353,8 @@ const handleCompleteSale = () => {
 
     installmentPlans.push({
       id: transactionId,
-      customer,
-      netTotal,
+      customer: customer,
+      total: netTotal, 
       downPayment: getActualDownPayment(),
       remainingBalance: getRemainingBalance(),
       numberOfPayments: installmentPlan.numberOfPayments,
@@ -359,6 +363,8 @@ const handleCompleteSale = () => {
       startDate: installmentPlan.startDate,
       payments: paymentSchedule,
       status: 'active',
+      transactionId: transactionId,  
+      customerId: customer.id, 
     });
 
     localStorage.setItem(

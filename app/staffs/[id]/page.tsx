@@ -33,8 +33,7 @@ import { format } from 'date-fns';
 
 type Staff = {
   id: string;
-  firstName: string;
-  lastName: string;
+  full_name: string;
   username: string;
   email: string;
   phone: string;
@@ -62,8 +61,7 @@ export default function StaffDetailPage() {
   const [isCredentialDialogOpen, setIsCredentialDialogOpen] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [editForm, setEditForm] = useState({
-    firstName: '',
-    lastName: '',
+    full_name: '',
     email: '',
     phone: '',
     address: '',
@@ -87,8 +85,7 @@ export default function StaffDetailPage() {
 
     const mockStaff: Staff = {
       id: params.id as string,
-      firstName: 'John',
-      lastName: 'Doe',
+      full_name: 'John Doe',
       username: 'johndoe',
       email: 'john@business.com',
       phone: '+234 123 456 7890',
@@ -104,8 +101,7 @@ export default function StaffDetailPage() {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setStaff(mockStaff);
     setEditForm({
-      firstName: mockStaff.firstName,
-      lastName: mockStaff.lastName,
+      full_name: mockStaff.full_name,
       email: mockStaff.email,
       phone: mockStaff.phone,
       address: mockStaff.address,
@@ -216,7 +212,7 @@ export default function StaffDetailPage() {
             <div>
               <h1 className="text-2xl font-bold">Staff Details</h1>
               <p className="text-sm text-gray-500">
-                View and manage {staff.firstName} {staff.lastName}&apos;s information
+                View and manage {staff.full_name}&apos;s information
               </p>
             </div>
           </div>
@@ -240,22 +236,15 @@ export default function StaffDetailPage() {
                 <div className="space-y-4 py-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="edit-firstName">First Name</Label>
+                      <Label htmlFor="edit-fullName">Full Name</Label>
                       <Input
-                        id="edit-firstName"
-                        value={editForm.firstName}
-                        onChange={(e) => setEditForm({...editForm, firstName: e.target.value})}
+                        id="edit-fullName"
+                        value={editForm.full_name}
+                        onChange={(e) => setEditForm({...editForm, full_name: e.target.value})}
                       />
                     </div>
                     
-                    <div className="space-y-2">
-                      <Label htmlFor="edit-lastName">Last Name</Label>
-                      <Input
-                        id="edit-lastName"
-                        value={editForm.lastName}
-                        onChange={(e) => setEditForm({...editForm, lastName: e.target.value})}
-                      />
-                    </div>
+              
                     
                     <div className="space-y-2">
                       <Label htmlFor="edit-email">Email Address</Label>
@@ -414,11 +403,11 @@ export default function StaffDetailPage() {
                   <Avatar className="h-32 w-32 mb-4">
                     <AvatarImage src={staff.avatar} />
                     <AvatarFallback className="text-2xl">
-                      {staff.firstName[0]}{staff.lastName[0]}
+                      {staff.full_name.split(' ').map(n => n[0]).join('')}
                     </AvatarFallback>
                   </Avatar>
                   
-                  <h2 className="text-xl font-bold">{staff.firstName} {staff.lastName}</h2>
+                  <h2 className="text-xl font-bold">{staff.full_name}</h2>
                   <div className="flex items-center gap-2 mt-2">
                     {getRoleBadge(staff.role)}
                     {getStatusBadge(staff.status)}
@@ -508,7 +497,7 @@ export default function StaffDetailPage() {
                   <div className="space-y-4">
                     <div>
                       <Label className="text-sm text-gray-500">Full Name</Label>
-                      <p className="font-medium">{staff.firstName} {staff.lastName}</p>
+                      <p className="font-medium">{staff.full_name}</p>
                     </div>
                     
                     <div>

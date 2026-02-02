@@ -19,13 +19,14 @@ import {
 import { DashboardLayout } from './components/DashboardLayout';
 import { TabsContent } from '@/components/ui/tabs';
 import { IncomeExpenseChart } from './components/IncomeExpenseChart';
-import { SalesCategoryChart } from './components/SalesCategoryChart';
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { StockMovementTable } from '../inventory/components/StockMovement';
 import { TransactionsTab } from '../sales/components/TransactionsTab';
 import { Expense, ExpenseCategory, loginAttempts, Transaction } from '../utils/type';
 import { ExpensesTable } from '../expenses/component/ExpensesTable';
 import { toast } from 'sonner';
+import { CreditInstallmentOverview } from './components/SalesCategoryChart';
 
 export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState("overview");
@@ -193,7 +194,7 @@ const handleRejectLogin = (id: string) => {
          
           <div className="grid grid-cols-1  gap-6">
            
-            <div className="bg-white border border-gray-100 shadow-2xl
+           <div className="bg-white border border-gray-100 shadow-2xl
   rounded-xl 
   p-4 sm:p-5 lg:p-6">
               <div className="flex items-center justify-between mb-6">
@@ -217,31 +218,33 @@ const handleRejectLogin = (id: string) => {
               </div>
               <IncomeExpenseChart />
             </div>
+             </div>
 
-            
-            <div className="bg-white border border-gray-100 shadow-2xl rounded-xl p-4 sm:p-5 lg:p-6 w-full  ">
+          
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+            <StockAlertWidget />
+            <TopProductsWidget />
+          </div>
+
+
+          <div  className="grid grid-cols-1  gap-6">
+             <div className="bg-white border border-gray-100 shadow-2xl rounded-xl p-4 sm:p-5 lg:p-6 w-full  ">
       
  
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-2 sm:gap-0">
         <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
           <h3 className="text-lg sm:text-xl font-semibold text-gray-900 flex items-center gap-2">
             <PieChartIcon className="h-5 w-5 text-green-500" />
-            Sales by Category
+            Due Installment & Credit-installment Overview
           </h3>
-          <p className="text-sm sm:text-base text-gray-800">Revenue distribution</p>
+          <p className="text-sm sm:text-base text-gray-800">Credit-Installment</p>
         </div>
         <div className="text-sm sm:text-base text-gray-900">Selected: {dateRange}</div>
       </div>
 
       
-      <SalesCategoryChart />
-    </div>
-          </div>
-
-          
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-            <StockAlertWidget />
-            <TopProductsWidget />
+      <CreditInstallmentOverview/>
+           </div>
           </div>
         </TabsContent>
 
