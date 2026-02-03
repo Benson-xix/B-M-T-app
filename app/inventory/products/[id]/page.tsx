@@ -49,6 +49,7 @@ export default function ProductDetailPage() {
             sellingPrice: 299.99,
             quantity: 42,
             threshold: 10,
+            barcode: "1234567890123",
             images: [
               "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=800&fit=crop",
             ],
@@ -62,6 +63,7 @@ export default function ProductDetailPage() {
             sellingPrice: 299.99,
             quantity: 8,
             threshold: 10,
+            barcode: "1234567890124",
             images: [
               "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=800&fit=crop",
             ],

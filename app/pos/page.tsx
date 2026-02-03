@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import {Clock, User} from "lucide-react";
-import { CartItem, Customer, Draft, Product, ProductVariant } from '../utils/type';
+import { CartItem, Customer, Draft, mockProducts, Product, ProductVariant } from '../utils/type';
 import { LoadDraftModal } from './components/LoadDraftModal';
 import { CreateCustomerModal } from './components/CreateCustomerModal';
 import { CartSidebar } from './components/CartSidebarProps';
@@ -15,6 +15,8 @@ import { CheckoutModal } from './components/CheckoutModalProps';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { toast } from 'sonner';
+import { BarcodeScanner } from './components/BarcodeScanner';
 
 
 
@@ -35,6 +37,7 @@ export default function POSPage() {
  const [cart, setCart] = useState<CartItem[]>([]);
   const [taxRate, setTaxRate] = useState<number>(0);
   const [isHydrated, setIsHydrated] = useState<boolean>(false);
+    const [isScannerProcessing, setIsScannerProcessing] = useState<boolean>(false);  // Add this
 
 
 
@@ -69,104 +72,8 @@ const handleResetCart = () => {
     });
   };
  
-  const mockProducts: Product[] = [
-    {
-      id: "1",
-      name: "Premium Leather Jacket",
-      sku: "PLJ-001",
-      brand: "Gucci",
-      category: "Jackets",
-      description: "Premium leather jacket",
-      taxable: true,
-      unit: "Pieces",
-      hasVariations: true,
-      images: ["https://images.unsplash.com/photo-1551028719-00167b16eac5"],
-       discount: {
-        id: 'dis1',
-      name: "Winter Sale",
-      type: "percentage",
-      value: 10,
-      status: 'expired'
-    },
-      variants: [
-        {
-          id: "1-1",
-          name: "Red - XL",
-          sku: "GUCCI-RED-XL-JACKET",
-          attributes: { Color: "Red", Size: "XL" },
-          costPrice: 150,
-          sellingPrice: 299.99,
-          quantity: 42,
-          threshold: 10,
-          images: ["https://images.unsplash.com/photo-1551028719-00167b16eac5"],
-          
-        },
-        {
-          id: "1-2",
-          name: "Black - L",
-          sku: "GUCCI-BLACK-L-JACKET",
-          attributes: { Color: "Black", Size: "L" },
-          costPrice: 150,
-          sellingPrice: 299.99,
-          quantity: 8,
-          threshold: 10,
-          images: ["https://images.unsplash.com/photo-1591047139829-d91aecb6caea"]
-        },
-      ],
-      inventoryValue: 15499.58,
-      inventoryCost: 7500,
-      totalStock: 50,
-      totalRevenue: 29999.00,
-    },
-    {
-      id: "2",
-      name: "Designer Denim Jeans",
-      sku: "DDJ-002",
-      brand: "Levi's",
-      category: "Pants",
-      description: "Designer denim jeans",
-      taxable: true,
-      unit: "Pieces",
-      hasVariations: true,
-      images: ["https://images.unsplash.com/photo-1542272604-787c3835535d"],
-       discount: {
-      id: 'dis2',
-      name: "Winter Sale",
-      type: "fixed",
-      value: 30,
-      status: 'active'
-    },
-      variants: [
-        {
-          id: "2-1",
-          name: "Blue - 32",
-          sku: "LEVIS-BLUE-32-JEANS",
-          attributes: { Color: "Blue", Size: "32" },
-          costPrice: 45,
-          sellingPrice: 89.99,
-          quantity: 0,
-          threshold: 5,
-          images: ["https://images.unsplash.com/photo-1542272604-787c3835535d"]
-        },
-        {
-          id: "2-2",
-          name: "Black - 34",
-          sku: "LEVIS-BLACK-34-JEANS",
-          attributes: { Color: "Black", Size: "34" },
-          costPrice: 45,
-          sellingPrice: 89.99,
-          quantity: 25,
-          threshold: 5,
-          images: ["https://images.unsplash.com/photo-1542272604-787c3835535d"]
-        },
-      ],
-      inventoryValue: 2249.75,
-      inventoryCost: 1125,
-      totalStock: 25,
-      totalRevenue: 4499.50,
-    },
-    
-  ];
+
+
 
  
 
@@ -322,6 +229,61 @@ const calculateDiscount = () => {
     );
   }
 
+const handleBarcodeScanned = async (barcode: string) => {
+  setIsScannerProcessing(true);
+  
+  try {
+   
+    const variant = findVariantByBarcode(barcode);
+    
+    if (!variant) {
+      toast.error(`Barcode not found: ${barcode}`);
+      setIsScannerProcessing(false);
+      return;
+    }
+
+    if (variant.quantity <= 0) {
+      toast.error(`Out of stock: ${variant.name}`);
+      setIsScannerProcessing(false);
+      return;
+    }
+
+  
+    const product = mockProducts.find(p => 
+      p.variants.some(v => v.id === variant.id)
+    );
+
+    if (product) {
+    
+      const existingCartItem = cart.find(item => item.variantId === variant.id);
+
+      if (existingCartItem) {
+       
+        handleUpdateQuantity(existingCartItem.id, existingCartItem.quantity + 1);
+        toast.success(`Updated: ${product.name} - ${variant.name} (Qty: ${existingCartItem.quantity + 1})`);
+      } else {
+       
+        handleAddToCart(variant, product);
+        toast.success(`Added: ${product.name} - ${variant.name}`);
+      }
+    }
+  } catch (error) {
+    console.error('Barcode scan error:', error);
+    toast.error('Failed to process barcode');
+  } finally {
+    setIsScannerProcessing(false);
+  }
+};
+
+
+const findVariantByBarcode = (barcode: string): ProductVariant | undefined => {
+  for (const product of mockProducts) {
+    const variant = product.variants.find(v => v.barcode === barcode);
+    if (variant) return variant;
+  }
+  return undefined;
+};
+
 
   return (
       <div className="min-h-screen bg-gray-50 text-gray-900">
@@ -372,7 +334,8 @@ const calculateDiscount = () => {
           <div className="flex-1 overflow-hidden flex flex-col">
        
             <POSHeader />
-            
+
+             
           
             <ProductFilters
               products={mockProducts}
@@ -391,6 +354,14 @@ const calculateDiscount = () => {
               variants={filteredVariants}
               onAddToCart={handleAddToCart}
             />
+
+
+               <div className="px-6 pt-4">
+            <BarcodeScanner 
+              onBarcodeScanned={handleBarcodeScanned}
+              isProcessing={isScannerProcessing}
+            />
+                </div>
           </div>
           
        

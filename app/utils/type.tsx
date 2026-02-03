@@ -8,6 +8,7 @@ export interface ProductVariant {
   id: string;
   name: string;
   sku: string;
+  barcode: string; 
   attributes: Record<string, string>;
   costPrice: number;
   sellingPrice: number;
@@ -289,3 +290,103 @@ export type Discount = {
   status: DiscountStatus;
 };
 
+ export const mockProducts: Product[] = [
+  {
+    id: "1",
+    name: "Premium Leather Jacket",
+    sku: "PLJ-001",
+    brand: "Gucci",
+    category: "Jackets",
+    description: "Premium leather jacket",
+    taxable: true,
+    unit: "Pieces",
+    hasVariations: true,
+    images: ["https://images.unsplash.com/photo-1551028719-00167b16eac5"],
+    discount: {
+      id: 'dis1',
+      name: "Winter Sale",
+      type: "percentage",
+      value: 10,
+      status: 'expired'
+    },
+    variants: [
+      {
+        id: "1-1",
+        name: "Red - XL",
+        sku: "GUCCI-RED-XL-JACKET",
+        barcode: "PRD-894521-A7K2",
+        attributes: { Color: "Red", Size: "XL" },
+        costPrice: 150,
+        sellingPrice: 299.99,
+        quantity: 42,
+        threshold: 10,
+        images: ["https://images.unsplash.com/photo-1551028719-00167b16eac5"],
+      },
+      {
+        id: "1-2",
+        name: "Black - L",
+        sku: "GUCCI-BLACK-L-JACKET",
+        barcode: "PRD-894521-B9M5",  
+        attributes: { Color: "Black", Size: "L" },
+        costPrice: 150,
+        sellingPrice: 299.99,
+        quantity: 8,
+        threshold: 10,
+        images: ["https://images.unsplash.com/photo-1591047139829-d91aecb6caea"]
+      },
+    ],
+    inventoryValue: 15499.58,
+    inventoryCost: 7500,
+    totalStock: 50,
+    totalRevenue: 29999.00,
+  },
+  {
+    id: "2",
+    name: "Designer Denim Jeans",
+    sku: "DDJ-002",
+    brand: "Levi's",
+    category: "Pants",
+    description: "Designer denim jeans",
+    taxable: true,
+    unit: "Pieces",
+    hasVariations: true,
+    images: ["https://images.unsplash.com/photo-1542272604-787c3835535d"],
+    discount: {
+      id: 'dis2',
+      name: "Winter Sale",
+      type: "fixed",
+      value: 30,
+      status: 'active'
+    },
+    variants: [
+      {
+        id: "2-1",
+        name: "Blue - 32",
+        sku: "LEVIS-BLUE-32-JEANS",
+        barcode: "PRD-123456-C3P8", 
+        attributes: { Color: "Blue", Size: "32" },
+        costPrice: 45,
+        sellingPrice: 89.99,
+        quantity: 0,
+        threshold: 5,
+        images: ["https://images.unsplash.com/photo-1542272604-787c3835535d"]
+      },
+      {
+        id: "2-2",
+        name: "Black - 34",
+        sku: "LEVIS-BLACK-34-JEANS",
+        barcode: "PRD-123456-D7R1",  
+        attributes: { Color: "Black", Size: "34" },
+        costPrice: 45,
+        sellingPrice: 89.99,
+        quantity: 25,
+        threshold: 5,
+        images: ["https://images.unsplash.com/photo-1542272604-787c3835535d"]
+      },
+    ],
+    inventoryValue: 2249.75,
+    inventoryCost: 1125,
+    totalStock: 25,
+    totalRevenue: 4499.50,
+  },
+];

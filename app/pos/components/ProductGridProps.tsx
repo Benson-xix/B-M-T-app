@@ -4,9 +4,9 @@ import { useState } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ShoppingCart, ChevronLeft, ChevronRight } from "lucide-react";
+import { ShoppingCart, ChevronLeft, ChevronRight, Copy } from "lucide-react";
 
-import Image from 'next/image';
+import Image from 'next/image';  
 import { Discount, Product, ProductVariant } from '@/app/utils/type';
 
 interface ProductGridProps {
@@ -159,7 +159,28 @@ const getStockStatus = (
                     <div className="text-xs text-gray-500 font-mono truncate">
                       SKU: {variant.sku}
                     </div>
-                  </CardContent>
+
+
+                  <div className={`text-xs flex text-gray-600 font-mono truncate bg-gray-50 p-1 rounded border ${
+                    variant.quantity === 0 
+                      ? 'border-gray-200 opacity-50 cursor-not-allowed' 
+                      : 'border-gray-200'
+                  }`}>
+                    📦 {variant.barcode}
+                    <Copy 
+                      className={`h-3 w-3 ml-1 ${
+                        variant.quantity === 0
+                          ? 'cursor-not-allowed text-gray-400'
+                          : 'cursor-pointer hover:text-blue-600'
+                      }`}
+                      onClick={() => {
+                        if (variant.quantity > 0) {
+                          navigator.clipboard.writeText(variant.barcode);
+                        }
+                      }}
+                    />
+                  </div>
+                  </CardContent >
                 </Card>
               );
             })}

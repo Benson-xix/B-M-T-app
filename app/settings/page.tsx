@@ -18,6 +18,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Building, Lock, UserCog, Plus, Pencil, Trash2, Save, Upload, Eye, EyeOff, CheckCircle, Percent } from 'lucide-react';
 import { InventoryLayout } from '../inventory/components/InventoryLayout';
 import { toast } from 'sonner';
+import Link from 'next/link';
 
 
 const PRODUCT_PERMISSIONS = {
@@ -458,15 +459,21 @@ const paginatedRoles = roles.slice(
 
   return (
     <InventoryLayout>
-      <div className="p-4 md:p-6 space-y-6 bg-white text-gray-900">
+      <div className="p-1 md:p-4 space-y-6 bg-white text-gray-900">
 
-        <div className="flex justify-between items-center">
+        <div className="  grid grid-cols-1 gap-2 md:gap-0 md:flex justify-between items-center">
           <div>
             <h1 className="text-2xl font-bold">Settings</h1>
             <p className="text-sm text-gray-500">Manage your business settings and permissions</p>
           </div>
           
-       
+          
+          <div className='grid grid-cols-1 gap-2'>
+            <Link href="/barcode">
+            <Button variant="link" className="bg-gray-900 hover:bg-gray-800 text-gray-100">
+             Print Barcodes
+            </Button>
+          </Link>       
           <Dialog open={isTaxDialogOpen} onOpenChange={setIsTaxDialogOpen}>
             <DialogTrigger asChild>
               <Button 
@@ -548,12 +555,13 @@ const paginatedRoles = roles.slice(
               </DialogFooter>
             </DialogContent>
           </Dialog>
+          </div>
         </div>
-
+        
 
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full ">
-          <TabsList className="grid w-full md:w-auto grid-cols-2 bg-gray-900 text-white h-20 md:h-10">
+          <TabsList className="grid w-full md:w-auto grid-cols-1 sm:grid-cols-2 bg-gray-900 text-white h-20 md:h-10">
             <TabsTrigger value="business" className="flex items-center gap-2">
               <Building className="w-4 h-4" />
               Business Details

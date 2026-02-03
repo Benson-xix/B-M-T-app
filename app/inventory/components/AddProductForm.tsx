@@ -10,7 +10,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-import { Plus, Trash2, Image as ImageIcon, Hash,Layers } from "lucide-react";
+import { Plus, Trash2, Image as ImageIcon, Hash,Layers, RefreshCw } from "lucide-react";
 import { toast } from 'sonner';
 import Image from 'next/image';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -26,6 +26,24 @@ interface Variation {
   threshold: number;
   images: string[];
 }
+
+const generateUniqueBarcode = (): string => {
+  let barcode: string;
+  let isUnique = false;
+  const existingBarcodes = new Set<string>();
+
+  while (!isUnique) {
+    barcode = `PRD-${Date.now().toString().slice(-6)}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
+    
+    if (!existingBarcodes.has(barcode)) {
+      isUnique = true;
+      existingBarcodes.add(barcode);
+    }
+  }
+
+  return barcode!;
+};
+
 
     function AttributeItem({
   attr,
@@ -132,6 +150,8 @@ const [customBaseSku, setCustomBaseSku] = useState<string | null>(null);
 
 const [categoryModalOpen, setCategoryModalOpen] = useState(false);
 const [newCategoryName, setNewCategoryName] = useState("");
+  const [singleBarcode, setSingleBarcode] = useState<string>("");
+
 
     function abbreviateWord(word: string): string {
   if (word.length <= 3) return word.toUpperCase();
@@ -309,7 +329,7 @@ function buildVariations(
       id: existingVariant?.id ?? Date.now() + index,
       name,
       sku,
-      barcode: existingVariant?.barcode ?? "",
+      barcode: existingVariant?.barcode ?? generateUniqueBarcode(),
       costPrice: existingVariant?.costPrice ?? 0,
       sellingPrice: existingVariant?.sellingPrice ?? 0,
       quantity: existingVariant?.quantity ?? 0,
@@ -353,6 +373,19 @@ const handleVariantImageUpload = (id: number, files: FileList | null) => {
     )
   );
 };
+
+  const handleGenerateBarcode = () => {
+    const newBarcode = generateUniqueBarcode();
+    setSingleBarcode(newBarcode);
+    toast.success('Barcode generated');
+  };
+
+
+  const handleRegenerateVariantBarcode = (variantId: number) => {
+    const newBarcode = generateUniqueBarcode();
+    updateVariantText(variantId, "barcode", newBarcode);
+    toast.success('Barcode regenerated');
+  };
 
 
   return (
@@ -605,15 +638,23 @@ const handleVariantImageUpload = (id: number, files: FileList | null) => {
 
                             <div className="flex flex-col gap-3">
                               <Label>Barcode</Label>
-                              <Input
-                                type="text"
-                                placeholder="Scan or enter barcode"
-                                value={variant.barcode}
-                                onChange={(e) =>
-                                  updateVariantText(variant.id, "barcode", e.target.value)
-                                }
-                                className="border-gray-900 border-2 shadow-lg"
-                              />
+                              <div className="flex gap-2">
+                                <Input
+                                  type="text"
+                                  placeholder="Auto-generated"
+                                  value={variant.barcode}
+                                  readOnly
+                                  className="border-gray-900 border-2 shadow-lg bg-gray-100 cursor-not-allowed"
+                                />
+                                <Button
+                                  size="icon"
+                                  variant="outline"
+                                  onClick={() => handleRegenerateVariantBarcode(variant.id)}
+                                  title="Regenerate barcode"
+                                >
+                                  <RefreshCw className="h-4 w-4" />
+                                </Button>
+                              </div>
                             </div>
 
                           </div>
@@ -689,14 +730,26 @@ const handleVariantImageUpload = (id: number, files: FileList | null) => {
                       <Input type="number" placeholder="10" className='border-gray-900 border-2 shadow-lg' />
                     </div>
 
-                   <div className="flex flex-col gap-3">
-                    <Label>Barcode</Label>
-                    <Input
-                      type="text"
-                      placeholder="Scan or enter barcode"
-                      className="border-gray-900 border-2 shadow-lg"
-                    />
-                  </div> 
+                 <div className="flex flex-col gap-3">
+                      <Label>Barcode</Label>
+                      <div className="flex gap-2">
+                        <Input
+                          type="text"
+                          placeholder="Auto-generated"
+                          value={singleBarcode}
+                          readOnly
+                          className="border-gray-900 border-2 shadow-lg bg-gray-100 cursor-not-allowed"
+                        />
+                        <Button
+                          size="icon"
+                          variant="secondary"
+                          onClick={handleGenerateBarcode}
+                          title="Generate barcode"
+                        >
+                          <RefreshCw className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
