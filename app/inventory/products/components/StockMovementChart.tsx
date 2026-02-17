@@ -9,6 +9,8 @@ import {
   Tooltip,
   CartesianGrid,
   ResponsiveContainer,
+  TooltipProps,
+  TooltipContentProps,
 } from 'recharts';
 import {
   Select,
@@ -33,6 +35,50 @@ type ChartDataPoint = {
 };
 
 type FilterType = 'today' | 'week' | 'month' | 'year';
+
+type StockTooltipPayload = {
+  stock: number;
+  increase?: number;
+  decrease?: number;
+  transaction_count: number;
+};
+
+const StockMovementTooltip = ({
+  active,
+  payload,
+  label,
+}: TooltipContentProps<number, string>) => {
+  if (!active || !payload || !payload.length) return null;
+
+  const data = payload[0].payload as StockTooltipPayload;
+
+  return (
+    <div className="rounded-lg bg-gray-900 border border-gray-700 p-3 space-y-1">
+      <div className="text-xs text-gray-400">{label}</div>
+
+      <div className="text-sm text-white">
+        Stock: <span className="font-semibold">{data.stock}</span>
+      </div>
+
+      {data.increase && data.increase > 0 && (
+        <div className="text-green-400 text-sm">
+          +{data.increase} restocked
+        </div>
+      )}
+
+      {data.decrease && data.decrease > 0 && (
+        <div className="text-red-400 text-sm">
+          -{data.decrease} sold/adjusted
+        </div>
+      )}
+
+      <div className="text-xs text-gray-400">
+        {data.transaction_count} transactions
+      </div>
+    </div>
+  );
+};
+
 
 export function StockMovementChart({
   productId,
@@ -133,9 +179,27 @@ export function StockMovementChart({
   };
 
 
-  const tooltipFormatter = (value: number | undefined): [string, string] => {
-    return [String(value ?? 0), 'Stock'];
-  };
+//  const tooltipFormatter = (_: number, __: string, props: any) => {
+//   const { payload } = props;
+//   if (!payload) return [];
+
+//   return [
+//     <>
+//       <div className="text-sm">Stock: {payload.stock}</div>
+//       {payload.increase > 0 && (
+//         <div className="text-green-400">+{payload.increase} restocked</div>
+//       )}
+//       {payload.decrease > 0 && (
+//         <div className="text-red-400">-{payload.decrease} adjusted/sold</div>
+//       )}
+//       <div className="text-gray-400 text-xs">
+//         {payload.transaction_count} transactions
+//       </div>
+//     </>,
+//     ''
+//   ];
+// };
+
 
   return (
     <div className="space-y-4">
@@ -204,8 +268,8 @@ export function StockMovementChart({
                   borderRadius: '0.5rem'
                 }}
                 labelStyle={{ color: '#E5E7EB' }}
-                formatter={tooltipFormatter}
-                labelFormatter={formatTooltipLabel}
+               content={StockMovementTooltip}
+              labelFormatter={formatTooltipLabel}
               />
               <Line
                 type="monotone"

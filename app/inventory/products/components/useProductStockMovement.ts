@@ -6,6 +6,8 @@ export interface StockMovementPoint {
   date: string;
   stock: number;
   change: number;
+  increase?: number;
+  decrease?: number;
   transaction_count: number;
 }
 
