@@ -30,9 +30,9 @@ export function AuthForm({ title, description, children, footer }: AuthFormProps
             <div className="w-1 h-6 bg-green-400 rounded-full"></div>
             <Link href="/" className="group">
               <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tighter">
-                <span className="text-green-400 group-hover:text-green-400 transition-colors">BIG MEN</span>
+                <span className="text-green-400 group-hover:text-green-400 transition-colors">Prime</span>
                 <span className="block text-sm sm:text-base font-medium text-gray-300 mt-1">
-                  TRANSACTION APPAREL
+                  Labs
                 </span>
               </h1>
             </Link>

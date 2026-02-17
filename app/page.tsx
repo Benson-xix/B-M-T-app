@@ -24,9 +24,9 @@ export default function Home() {
           <div className="inline-flex items-center justify-center gap-3 md:gap-6 mb-4">
             <div className="hidden sm:block w-1.5 h-8 md:w-2 md:h-12 bg-green-400 rounded-full"></div>
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white tracking-tighter">
-              <span className="text-green-400">BIG MEN</span>
+              <span className="text-green-400">Prime</span>
               <span className="block text-lg sm:text-xl md:text-2xl lg:text-3xl font-medium text-gray-300 mt-1 md:mt-2">
-                TRANSACTION APPAREL
+                Labs
               </span>
             </h1>
             <div className="hidden sm:block w-1.5 h-8 md:w-2 md:h-12 bg-green-400 rounded-full"></div>
