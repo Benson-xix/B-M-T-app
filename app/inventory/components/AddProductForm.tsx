@@ -1037,50 +1037,64 @@ payload.variants.forEach((variant, index) => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Button onClick={downloadErrorReport} variant="outline">
-          Download Import Report
-        </Button>
-        {uploadProgress.isUploading && (
-  <div className="flex items-center gap-3 mt-3 text-sm text-gray-700">
-    <Loader className="h-4 w-4 animate-spin" />
-    Uploading {uploadProgress.current} / {uploadProgress.total}
+      <div className="mb-8">
+  <div className="flex flex-wrap gap-3 items-center bg-gray-50 border border-gray-200 rounded-xl p-4 shadow-sm">
+    <Button
+      onClick={downloadErrorReport}
+      variant="outline"
+      className="flex items-center gap-2"
+      disabled={importReport.length === 0}
+      title={importReport.length === 0 ? "No import report yet" : ""}
+    >
+      <Loader className="h-4 w-4 text-gray-500" />
+      Download Import Report
+    </Button>
+
+    <Button
+      className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white"
+      asChild
+    >
+      <label className="cursor-pointer">
+        <Plus className="h-4 w-4" />
+        Bulk Upload (Excel)
+        <input
+          type="file"
+          accept=".xlsx,.xls"
+          className="hidden"
+          onChange={handleExcelUpload}
+        />
+      </label>
+    </Button>
+
+    <Button
+      variant="outline"
+      className="flex items-center gap-2"
+      onClick={downloadExcelTemplate}
+    >
+      <Hash className="h-4 w-4" />
+      Download Excel Template
+    </Button>
+
+    <label className="flex items-center gap-2 cursor-pointer bg-white border border-gray-300 rounded px-3 py-2 hover:bg-gray-100 transition">
+      <ImageIcon className="h-4 w-4" />
+      Bulk Images
+      <input
+        type="file"
+        multiple
+        accept="image/*"
+        className="hidden"
+        onChange={e => setBulkImages(e.target.files)}
+      />
+    </label>
+
+    {uploadProgress.isUploading && (
+      <div className="flex items-center gap-2 ml-auto text-sm text-blue-700 font-medium">
+        <Loader className="h-4 w-4 animate-spin" />
+        Uploading {uploadProgress.current} / {uploadProgress.total}
+      </div>
+    )}
   </div>
-)}
-
-          <Button
-  className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white"
-  asChild
->
-  <label>
-    <Plus className="h-4 w-4" />
-    Bulk Upload (Excel)
-    <input
-      type="file"
-      accept=".xlsx,.xls"
-      className="hidden"
-      onChange={handleExcelUpload}
-    />
-  </label>
-          </Button>
-
-          <Button
-  variant="outline"
-  className="ml-2"
-  onClick={downloadExcelTemplate}
->
-  Download Excel Template
-</Button>
-          <label className="flex items-center gap-2 cursor-pointer mt-2">
-            <ImageIcon className="h-4 w-4" />
-            Bulk Images
-            <input
-              type="file"
-              multiple
-              accept="image/*"
-              className="hidden"
-              onChange={e => setBulkImages(e.target.files)}
-            />
-          </label>
+</div>
           
           <div className="space-y-6">
        
