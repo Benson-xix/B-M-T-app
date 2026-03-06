@@ -17,7 +17,7 @@ import { usePageGuard } from '@/app/hooks/usePageGuard';
 export  function InventoryPage() {
    usePageGuard();
   const [activeTab, setActiveTab] = useState("overview");
-  const [searchQuery] = useState("");
+   const [searchQuery, setSearchQuery] = useState("");
 
   return (
     <div className="space-y-6 bg-white lg:p-6 p-1">
@@ -63,6 +63,15 @@ export  function InventoryPage() {
         </div>
       </div>
 
+      <div className="flex justify-end mt-2">
+        <input
+          type="text"
+          placeholder="Search product by name..."
+          value={searchQuery}
+          onChange={e => setSearchQuery(e.target.value)}
+          className="border border-gray-300 rounded-md px-3 py-2 w-full max-w-xs focus:outline-none focus:ring-2 focus:ring-green-400"
+        />
+      </div>
      
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6 ">
         <TabsList className="grid grid-cols-2 lg:grid-cols-5 h-auto p-1 bg-gray-900 rounded-lg w-full">
