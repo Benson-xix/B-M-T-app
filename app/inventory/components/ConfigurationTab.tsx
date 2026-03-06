@@ -182,7 +182,7 @@ export function ConfigureTab() {
 
     try {
       const token = getToken();
-      const response = await fetch(`${apiUrl}/attributes/${attrId}/values`, {
+      const response = await fetch(`${apiUrl}/configure/attributes/${attrId}/values`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
