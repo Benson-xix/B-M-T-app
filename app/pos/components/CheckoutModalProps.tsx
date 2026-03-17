@@ -120,18 +120,6 @@ const [installmentPlan, setInstallmentPlan] = useState<InstallmentPlan>({
 });
 
 useEffect(() => {
-  if (
-    paymentMethod !== 'split' &&
-    !(paymentMethod === 'credit' && creditType === 'full')
-  ) {
-    setAmountPaid(netTotal.toFixed(2));
-  }
-  if (paymentMethod === 'credit' && creditType === 'full') {
-    setAmountPaid('0');
-  }
-}, [paymentMethod, creditType, netTotal]);
-
-useEffect(() => {
   setInstallmentPlan(prev => ({
     ...prev,
     customer: customer,
@@ -203,8 +191,12 @@ const calculateInstallments = () => {
 const handleCompleteSale = async () => {
   
   // eslint-disable-next-line react-hooks/purity
-  const transactionId = `txn_${Date.now()}`;
-  setTransactionId(transactionId);
+
+  const newTransactionId = transactionId || `txn_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  if (!transactionId) {
+    setTransactionId(newTransactionId);
+  }
+
   const timestamp = new Date().toISOString();
 
   if (paymentMethod === 'credit' && !isCustomerVerified) {
@@ -284,7 +276,7 @@ const handleCompleteSale = async () => {
 
 
  const transaction = {
-  id: transactionId,
+  id: newTransactionId,
   customer,
   items: cart,
   subtotal,
@@ -479,7 +471,7 @@ const handleCompleteSale = async () => {
       }),
       discount: Math.round((totalDiscount || 0) * 100) / 100,
       taxes: Math.round(customTax * 100) / 100,
-      note: `Transaction ${transactionId} - ${purchaseType}`,
+      note: `Transaction ${newTransactionId} - ${purchaseType}`,
     };
 
     // Call backend API
@@ -491,12 +483,13 @@ const handleCompleteSale = async () => {
     const allTransactions = JSON.parse(
       localStorage.getItem('pos_transactions') || '[]'
     );
-    const txIndex = allTransactions.findIndex((t: Transaction) => t.id === transactionId);
+    const txIndex = allTransactions.findIndex((t: Transaction) => t.id === newTransactionId);
     if (txIndex >= 0) {
       allTransactions[txIndex] = {
         ...allTransactions[txIndex],
         synced: true,
         status: 'completed' as const,
+        backendId: result.id,
       };
       localStorage.setItem('pos_transactions', JSON.stringify(allTransactions));
     }
@@ -518,26 +511,38 @@ const handleCompleteSale = async () => {
   } catch (error) {
     console.error('Checkout error:', error);
 
-    const failedTransaction: Transaction = {
-      ...transaction,
-      status: 'failed',
-      synced: false,
-    };
 
-   
     const transactions = JSON.parse(
       localStorage.getItem('pos_transactions') || '[]'
     );
- 
-    const txIndex = transactions.findIndex((t: Transaction) => t.id === transaction.id);
+    const txIndex = transactions.findIndex((t: Transaction) => t.id === newTransactionId);
+    
     if (txIndex >= 0) {
-      transactions[txIndex] = failedTransaction;
+   
+      transactions[txIndex] = {
+        ...transactions[txIndex],
+        status: 'failed' as const,
+        synced: false,
+      };
     } else {
-      transactions.push(failedTransaction);
+   
+      transactions.push({
+        ...transaction,
+        status: 'failed' as const,
+        synced: false,
+      });
     }
     localStorage.setItem('pos_transactions', JSON.stringify(transactions));
 
-    OfflineTransactionManager.addTransaction(failedTransaction);
+ 
+    const offlineTransactions = OfflineTransactionManager.getTransactions();
+    const isAlreadyTracked = offlineTransactions.some(t => t.transactionData.id === newTransactionId);
+    if (!isAlreadyTracked) {
+      OfflineTransactionManager.addTransaction(transaction as Transaction);
+    } else {
+   
+      OfflineTransactionManager.markSyncAttempt(newTransactionId, error instanceof Error ? error.message : 'Unknown error');
+    }
     
     toast.error('❌ Transaction Failed', {
       description:
@@ -557,7 +562,17 @@ useEffect(() => {
   }
 }, [paymentMethod]);
 
-
+useEffect(() => {
+  if (
+    paymentMethod !== 'split' &&
+    !(paymentMethod === 'credit' && creditType === 'full')
+  ) {
+    setAmountPaid(netTotal.toFixed(2));
+  }
+  if (paymentMethod === 'credit' && creditType === 'full') {
+    setAmountPaid('0');
+  }
+}, [paymentMethod, creditType, netTotal]);
 
   const calculateDueDate = (startDate: string, frequency: string, offset: number) => {
     const date = new Date(startDate);
@@ -1049,7 +1064,7 @@ useEffect(() => {
                     <span>Discount</span>
                     <span>- NGN {totalDiscount.toFixed(2)}</span>
                   </div>
-                )}
+                ) }
                 <div className="flex justify-between font-bold text-lg">
                   <span>Total</span>
                   <span>NGN {netTotal.toFixed(2)}</span>
